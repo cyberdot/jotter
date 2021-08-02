@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jotter.Core", "Jotter.Core\Jotter.Core.fsproj", "{221710CC-7158-4A74-BF57-3380CC2DEBD9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jotter.Core.Tests", "Jotter.Core.Tests\Jotter.Core.Tests.fsproj", "{67C25FF2-1B99-4428-ABD8-218892B68751}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{221710CC-7158-4A74-BF57-3380CC2DEBD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{221710CC-7158-4A74-BF57-3380CC2DEBD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{221710CC-7158-4A74-BF57-3380CC2DEBD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{221710CC-7158-4A74-BF57-3380CC2DEBD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67C25FF2-1B99-4428-ABD8-218892B68751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67C25FF2-1B99-4428-ABD8-218892B68751}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67C25FF2-1B99-4428-ABD8-218892B68751}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67C25FF2-1B99-4428-ABD8-218892B68751}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

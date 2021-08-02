@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <WarnOn>3390;$(WarnOn)</WarnOn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="IOUtils.fs" />
+        <Compile Include="Renderer.fs" />
+        <Compile Include="Config.fs" />
+        <Compile Include="Document.fs" />
+        <Compile Include="IndexPager.fs" />
+        <Compile Include="Theme.fs" />
+        <Compile Include="Layout.fs" />
+        <Compile Include="Assets.fs" />
+        <Compile Include="GA.fs" />
+        <Compile Include="DiscqusComments.fs" />
+        <Compile Include="Store.fs" />
+        <Compile Include="Post.fs" />
+        <Compile Include="Posts.fs" />
+        <Compile Include="Rss.fs" />
+        <Compile Include="Draft.fs" />
+        <Compile Include="Page.fs" />
+        <Compile Include="Index.fs" />
+        <Compile Include="SiteMap.fs" />
+        <Compile Include="Tags.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FSharp.Formatting" Version="11.4.2" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+      <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
+      <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>
