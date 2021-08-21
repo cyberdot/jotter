@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net50</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <WarnOn>3390;$(WarnOn)</WarnOn>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="IOUtils.fs" />
-        <Compile Include="Renderer.fs" />
         <Compile Include="Config.fs" />
         <Compile Include="Document.fs" />
+        <Compile Include="Renderer.fs" />
         <Compile Include="IndexPager.fs" />
         <Compile Include="Theme.fs" />
         <Compile Include="Layout.fs" />
@@ -18,20 +18,30 @@
         <Compile Include="GA.fs" />
         <Compile Include="DiscqusComments.fs" />
         <Compile Include="Store.fs" />
+        <Compile Include="Page.fs" />
         <Compile Include="Post.fs" />
         <Compile Include="Posts.fs" />
         <Compile Include="Rss.fs" />
         <Compile Include="Draft.fs" />
-        <Compile Include="Page.fs" />
         <Compile Include="Index.fs" />
         <Compile Include="SiteMap.fs" />
         <Compile Include="Tags.fs" />
+        <Compile Include="Site.fs" />
+        <Compile Include="Tasks\BuildTask.fs" />
+        <Compile Include="Tasks\DraftTask.fs" />
+        <Compile Include="Tasks\PageTask.fs" />
+        <Compile Include="Tasks\PostTask.fs" />
+        <Compile Include="Tasks\ServerTask.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="FSharp.Formatting" Version="11.4.2" />
+      <PackageReference Include="Giraffe" Version="4.1.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+      <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="6.0.0-preview.7.21377.19" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
+      <PackageReference Include="RazorLight" Version="2.0.0-rc.3" />
+      <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
       <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
     </ItemGroup>
 

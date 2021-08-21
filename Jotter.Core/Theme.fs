@@ -7,9 +7,9 @@ open Jotter.Core.IOUtils
 module Theme =
        
     let getTheme (config: ConfigurationModel) = config.theme
-    let current = Config.data |> getTheme
+    let current () = Config.data() |> getTheme
     
-    let init =
+    let init () =
         let dir = $"{Config.contentDirectory}/themes"
         Directory.CreateDirectory(dir) |> ignore
         copyDirectory "themes" dir

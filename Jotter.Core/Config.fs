@@ -31,6 +31,7 @@ module Config =
       disqusUrl: string;
       [<JsonProperty("enable_disqus_comments")>]
       enableDisqusComments: bool;    
+      blogIndex: string;
     }
 
 
@@ -41,7 +42,8 @@ module Config =
     let filePath = $"{contentDirectory}/{configFile}"
     
     let private defaultConfig = """
-    {{ 
+    
+    { 
       "name": "A brand new static site", 
       "author": "author_name",
       "author_description": "Author's description, skills, etc", 
@@ -52,20 +54,22 @@ module Config =
       "posts_per_page": 10, 
       "sort_posts": "ascending", 
       "theme": "poole", 
-	  "date_format": "%d %b %Y", 
+	  "date_format": "dd MMM yyyy", 
 	  "github": "github_account_name", 
 	  "twitter": "twitter_account_name", 
 	  "linked_in": "linked_in_account_name", 
 	  "email": "user_email@email-provider.com", 
 	  "disqus_url": "disqus_username.disqus.com", 
       "enable_disqus_comments": true 
-    }} """
+    }
+    
+    """
 
     let private loadConfig (content: string) = JsonConvert.DeserializeObject<ConfigurationModel>(content)
 
-    let init = File.WriteAllText(filePath, defaultConfig)
+    let init () = File.WriteAllText(filePath, defaultConfig)
 
-    let data = File.ReadAllText(filePath) |> loadConfig      
+    let data () = File.ReadAllText(filePath) |> loadConfig      
         
         
 

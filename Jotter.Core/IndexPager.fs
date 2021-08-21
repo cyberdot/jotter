@@ -7,9 +7,7 @@ open Jotter.Core.Config
 
 module IndexPager =
     
-    let lastPage pages =
-        let len = pages |> Seq.length
-        len = 0
+    let lastPage pages = (pages |> Seq.length) = 0
         
     let withIndexNum (page: string) (num: int) =
         if page = null && num = 1 then (1, "index.html")
@@ -21,14 +19,12 @@ module IndexPager =
             (num, $"{rootPath}{num}.{ext}")
     
     let totalPages (postsCount: int) =
-        let config = Config.data
+        let config = Config.data()
         let postsPerPage = config.postsPerPage
         let result: float = Math.Ceiling(float(postsCount) / float(postsPerPage))
         Math.Truncate(result)
         
     let previousPage (pageNum: int) (config: ConfigurationModel) =
-        if config = null then config = Config.data
-        else config = ConfigurationModel()
         
         if pageNum = 1 then (0, String.Empty)
         else
@@ -37,9 +33,7 @@ module IndexPager =
             
     
     let nextPage (pageNum: int) (isLast: bool) (config: ConfigurationModel) =
-        if config = null then config = Config.data
-        else config = ConfigurationModel()       
-        
+          
         if isLast = true then (0, String.Empty)
         else
             let blogIndex = config.blogIndex

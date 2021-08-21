@@ -8,8 +8,8 @@ open Jotter.Core.IOUtils
 
 module Assets =
     
-    let private copy =
-        let source = $"{Config.publicDirectory}/themes/{Theme.current}/assets"
+    let copy () =
+        let source = $"{Config.contentDirectory}/themes/{Theme.current()}/assets"
         let destination = $"{Config.publicDirectory}/assets"
         IOUtils.copyDirectory source destination
         
@@ -27,15 +27,16 @@ module Assets =
               |> Seq.map (fun f -> $"assets/js/{f.Name}")
               |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
          
-    let css =
+    let css () =
         let cssDir = $"{Config.publicDirectory}/assets/css"
         let exists = Directory.Exists(cssDir)
         match exists with
-            | true -> let links = cssFiles(cssDir) |> Seq.map (fun f -> $"<link rel\"stylesheet\" href=\"{f}\" />")
+            | true -> let links = cssFiles(cssDir) 
+                                    |> Seq.map (fun f -> $"<link rel=\"stylesheet\" href=\"{f}\" />")
                       String.Join("\n", links)                      
             | false -> String.Empty
      
-    let js =
+    let js () =
         let jsDir = $"{Config.publicDirectory}/assets/js"
         let exists = Directory.Exists(jsDir)
         match exists with

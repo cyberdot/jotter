@@ -12,14 +12,27 @@ open Jotter.Core.Assets
 
 module Post =
     
-    type Post = {
-        dateCreated: DateTimeOffset;
-        frontmatter: FrontMatter;
-        document: string;
-        path: string;
-        filename: string;
-        excerpt: string;
-        config: ConfigurationModel;        
+   
+    type PostLayoutViewModel = {
+       config: ConfigurationModel;
+       content: string;
+       frontmatter: FrontMatter;
+       filename: string;
+       path: string;
+    } with interface ILayoutViewModel with
+             member this.config with get() = this.config
+             member this.css with get() = String.Empty
+             member this.js with get() = String.Empty
+             member this.content with get() = this.content
+
+    type PostViewModel = {
+       config: ConfigurationModel;
+       js: string;
+       css: string;
+       content: string;
+       frontmatter: FrontMatter;
+       filename: string;
+       path: string;
     }
     
     let private defaultPost (title: string) =
@@ -43,59 +56,68 @@ module Post =
         let htmlContent = Markdown.ToHtml parsedContent
         
         let fileName = mdFile |> Document.fileName
-        let htmlPath = mdFile |> Document.htmlFilename
+        let htmlPath = mdFile |> Document.htmlFilename true
         let excerpt = htmlContent |> Document.createExcerpt
         
-        let (pageLayout, pageRenderer) = Layout.post
-        let (layoutTemplate, layoutRenderer) = Layout.post_layout
+        let (pageLayout, pageRenderer) = Layout.post()
+        let (layoutTemplate, layoutRenderer) = Layout.postLayout()
         
-        let vm = {|
-                   config = Config.data;
+        let vm = {
+                   config = Config.data();
                    content = htmlContent;
                    frontmatter = frontmatter;
                    filename = fileName;
                    path = htmlPath
-                 |}
+                 }
         let result = Renderer.render pageLayout vm pageRenderer
         
-        let dvm = {|
-                     config = Config.data;
-                     js = Assets.js;
-                     css = Assets.css;
+        let dvm = {
+                     config = Config.data();
+                     js = Assets.js();
+                     css = Assets.css();
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;
                      path = htmlPath;
-                  |}
+                  }
         let document = Renderer.render layoutTemplate dvm layoutRenderer
-        let post: Post = {
+        {
           dateCreated = frontmatter.created;
           frontmatter = frontmatter;
           document = document;
           path = htmlPath;
           filename = fileName;
           excerpt = excerpt;
-          config = Config.data;
+          config = Config.data();
         }
-        post
         
-    let prepare (mdFile: string) =
-        preparePage $"{Config.contentDirectory}/posts/{mdFile}"
+    let prepare (mdFile: string) (posts: Post list) =
+        let post = preparePage mdFile
+        Store.addPosts posts [post]
         
        
     let create (title: string) (isDraft: bool) =
       let dir = match isDraft with
-            | true -> $"{Config.contentDirectory}/drafts"
-            | false -> $"{Config.contentDirectory}/posts"
+                     | true -> $"{Config.contentDirectory}/drafts"
+                     | false -> $"{Config.contentDirectory}/posts"
       let path = IOUtils.filenameFromTitle dir title
       let content = defaultPost title
       File.WriteAllText(path, content) |> ignore        
         
-    let list =
+    let list () =
         let dir = $"{Config.contentDirectory}/posts"
-        Directory.GetFiles(dir) |> Seq.sort |> Seq.rev
+        Directory.GetFiles(dir) |> Array.sort |> Array.rev
         
-    let init =
-        let dir = $"{Config.contentDirectory}/posts"
-        Directory.CreateDirectory(dir)
+    let init () =
+        let contentDir = $"{Config.contentDirectory}/posts"
+        if (Directory.Exists(contentDir)) then
+            Directory.Delete(contentDir, true)
+        Directory.CreateDirectory(contentDir) |> ignore
+        
         create "Welcome to Jotter" false
+        
+    let setup () =
+         let publicDir = $"{Config.publicDirectory}/posts"
+         if(Directory.Exists(publicDir)) then
+             Directory.Delete(publicDir, true)
+         Directory.CreateDirectory(publicDir) |> ignore

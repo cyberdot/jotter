@@ -1,0 +1,100 @@
+@model Jotter.Core.Post.PostLayoutViewModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<base href="@Model.config.url" />
+
+    <title>@Model.config.name</title>
+    <meta name="description" content="@Model.config.description" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="/favicon.ico">
+	
+	@Model.css
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <link rel="canonical" href="@Model.config.url" />
+    <meta name="referrer" content="origin" />
+       
+    <meta property="og:site_name" content="@Model.config.name" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@Model.config.name" />
+    <meta property="og:description" content="@Model.config.description" />
+    <meta property="og:url" content="@Model.config.url" />
+	
+	<meta property="article:published_time" content="@Model.frontmatter.created" />
+    <meta property="article:modified_time" content="@Model.frontmatter.created" />
+	@if (Model.frontmatter.tags.Length > 0) {
+	  @foreach(var tag in Model.frontmatter.tags) {
+	    <meta property="article:tag" content="@tag" />
+	  }
+	}
+    
+	<meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="@Model.frontmatter.title" />
+    <meta name="twitter:description" content="@Model.frontmatter.description" />
+    <meta name="twitter:url" content="@Model.config.url/@Model.frontmatter.slug.html" />
+    
+       
+    <script type="application/ld+json">
+	{
+		"@@context": "http://schema.org",
+		"@@type": "Article",
+		"author": {
+			"@@type": "Person",
+			"name": "@Model.config.author",
+			"description": "@Model.config.authorDescription"
+		},
+		"headline": "@Model.frontmatter.title",
+		"publisher": "@Model.config.name",
+		"url": "@Model.config.url",
+		"datePublished": "@Model.frontmatter.created",
+		"dateModified": "@Model.frontmatter.created",
+		 @if (Model.frontmatter.tags.Length > 0) {
+		"keywords": "@System.String.Join(",", Model.frontmatter.tags)",	
+		 }		
+		"description": "@Model.config.description"
+	}
+    </script>
+
+    <meta name="generator" content="Dnevnik-1.0" />
+    <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="@Model.config.url/blog.rss" />
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+		<h3 class="nav-title">Menu</h3>
+		<a href="#" class="nav-close"><span class="hidden">Close</span></a>
+		<ul>
+			<li class="nav-home" role="presentation"><a href="@Model.config.url">Home</a></li>
+			<li class="nav-github" role="presentation"><a href="http://github.com/@Model.config.github">GitHub</a></li>
+		</ul>
+		<a class="subscribe-button icon-feed" href="@Model.config.url/blog.rss">Subscribe</a>
+	</div>
+	<span class="nav-cover"></span>
+
+    <div class="site-wrapper">
+		<header class="main-header post-head no-cover">
+			<nav class="main-nav clearfix">
+				<a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+			</nav>
+		</header>
+
+		@Model.content			
+		
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="@Model.config.url">@Model.config.name</a> &copy; 2017</section>
+            <section class="poweredby">Proudly published with <a href="https://github.com/cyberdot/dnevnik">Dnevnik</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>  
+	@Model.js
+</body>
+</html>

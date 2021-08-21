@@ -7,7 +7,7 @@ open System.Collections.Generic
 
 module Store =
     
-    let addPosts (postsStore: FrontMatter list) (posts: FrontMatter list) = postsStore @ posts
+    let addPosts (postsStore: Post list) (posts: Post list) = postsStore @ posts
         
-    let addPages (pagesStore: FrontMatter list) (pages: FrontMatter list) = pagesStore @ pages    
+    let addPages (pagesStore: Page list) (pages: Page list) = pagesStore @ pages    
     

@@ -1,0 +1,29 @@
+@model Jotter.Core.Post.PostViewModel
+
+<article class="post-container post-container--single">
+	<header class="post-header">
+		<div class="post-meta">
+			<time datetime="@Model.frontmatter.created" class="post-meta__date date">
+				Posted on @Model.frontmatter.created.ToString(Model.config.dateFormat).
+			</time> &#8226; 
+			@if (Model.frontmatter.tags.Length > 0) {
+			<span class="post-meta__tags">Tags:   
+				@foreach(var tag in Model.frontmatter.tags) {
+					<a href="/tags/@tag.html">@tag</a> 
+				}
+        	</span>
+			<% end %>	
+		</div>
+		<h1 class="post-title">@Model.frontmatter.title</h1>
+	</header>
+
+	<section class="post">
+		@Model.content
+	</section>
+	
+	@if (Model.config.enableDisqusComments) {
+		@Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl)	 
+	}
+
+</article>
+

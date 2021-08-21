@@ -1,0 +1,8 @@
+<div class="page">
+	<h1 class="page-title">Tags</h1>
+	<div class="tags">
+	@foreach(var tag in Model.content) {
+		<a class="round tag-cloud" href="/tags/@(Jotter.Core.IOUtils.urlSlug(tag)).html">@tag</a>
+	} 	
+	</div>
+</div>

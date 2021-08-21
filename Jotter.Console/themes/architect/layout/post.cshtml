@@ -1,0 +1,12 @@
+@model Jotter.Core.Post.PostViewModel
+
+<div>
+	<h2><@Model.frontmatter.title</h2>
+	<p class="meta">@Model.frontmatter.created</p>
+	@Model.content
+</div>
+
+
+@if(Model.config.enable_disqus_comments) { 
+	Jotter.Core.DisqusComments.render(@Model.path, @Model.config.disqus_url)	 
+}

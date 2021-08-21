@@ -1,0 +1,201 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <WarnOn>3390;$(WarnOn)</WarnOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+    <Content Include="themes\whisper\layout\tag_layout.eex" />
+    <Content Include="themes\whisper\layout\post_layout.eex" />
+    <Content Include="themes\whisper\layout\post.eex" />
+    <Content Include="themes\whisper\layout\page.eex" />
+    <Content Include="themes\whisper\layout\layout.eex" />
+    <Content Include="themes\whisper\layout\index.eex" />
+    <Content Include="themes\whisper\assets\js\jquery.fitvids.js" />
+    <Content Include="themes\whisper\assets\js\index.js" />
+    <Content Include="themes\whisper\assets\img\logo.png" />
+    <Content Include="themes\whisper\assets\fonts\casper-icons.woff" />
+    <Content Include="themes\whisper\assets\fonts\casper-icons.ttf" />
+    <Content Include="themes\whisper\assets\fonts\casper-icons.svg" />
+    <Content Include="themes\whisper\assets\fonts\casper-icons.eot" />
+    <Content Include="themes\whisper\assets\css\screen.css" />
+    <Content Include="themes\uno\layout\post.eex" />
+    <Content Include="themes\uno\layout\page.eex" />
+    <Content Include="themes\uno\layout\layout.eex" />
+    <Content Include="themes\uno\layout\index.eex" />
+    <Content Include="themes\uno\assets\js\main.js" />
+    <Content Include="themes\uno\assets\img\manifest.json" />
+    <Content Include="themes\uno\assets\img\logo.png" />
+    <Content Include="themes\uno\assets\img\favicon.ico" />
+    <Content Include="themes\uno\assets\img\favicon-96x96.png" />
+    <Content Include="themes\uno\assets\img\favicon-32x32.png" />
+    <Content Include="themes\uno\assets\img\favicon-194x194.png" />
+    <Content Include="themes\uno\assets\img\favicon-16x16.png" />
+    <Content Include="themes\uno\assets\img\background.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-76x76.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-72x72.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-60x60.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-57x57.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-180x180.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-152x152.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-144x144.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-120x120.png" />
+    <Content Include="themes\uno\assets\img\apple-touch-icon-114x114.png" />
+    <Content Include="themes\uno\assets\img\android-chrome-192x192.png" />
+    <Content Include="themes\uno\assets\fonts\foundation-icons\foundation-icons.woff" />
+    <Content Include="themes\uno\assets\css\animate.css" />
+    <Content Include="themes\uno\assets\css\3_main.css" />
+    <Content Include="themes\uno\assets\css\2_monokai.css" />
+    <Content Include="themes\uno\assets\css\1_uno.css" />
+    <Content Include="themes\pyxill\layout\post.eex" />
+    <Content Include="themes\pyxill\layout\page.eex" />
+    <Content Include="themes\pyxill\layout\layout.eex" />
+    <Content Include="themes\pyxill\layout\index_layout.eex" />
+    <Content Include="themes\pyxill\layout\index.eex" />
+    <Content Include="themes\pyxill\assets\js\styles\zenburn.css" />
+    <Content Include="themes\pyxill\assets\js\styles\xt256.css" />
+    <Content Include="themes\pyxill\assets\js\styles\xcode.css" />
+    <Content Include="themes\pyxill\assets\js\styles\vs.css" />
+    <Content Include="themes\pyxill\assets\js\styles\tomorrow.css" />
+    <Content Include="themes\pyxill\assets\js\styles\tomorrow-night.css" />
+    <Content Include="themes\pyxill\assets\js\styles\tomorrow-night-eighties.css" />
+    <Content Include="themes\pyxill\assets\js\styles\tomorrow-night-bright.css" />
+    <Content Include="themes\pyxill\assets\js\styles\tomorrow-night-blue.css" />
+    <Content Include="themes\pyxill\assets\js\styles\sunburst.css" />
+    <Content Include="themes\pyxill\assets\js\styles\solarized-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\solarized-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\school-book.png" />
+    <Content Include="themes\pyxill\assets\js\styles\school-book.css" />
+    <Content Include="themes\pyxill\assets\js\styles\rainbow.css" />
+    <Content Include="themes\pyxill\assets\js\styles\railscasts.css" />
+    <Content Include="themes\pyxill\assets\js\styles\qtcreator_light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\qtcreator_dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\purebasic.css" />
+    <Content Include="themes\pyxill\assets\js\styles\pojoaque.jpg" />
+    <Content Include="themes\pyxill\assets\js\styles\pojoaque.css" />
+    <Content Include="themes\pyxill\assets\js\styles\paraiso-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\paraiso-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\ocean.css" />
+    <Content Include="themes\pyxill\assets\js\styles\obsidian.css" />
+    <Content Include="themes\pyxill\assets\js\styles\monokai.css" />
+    <Content Include="themes\pyxill\assets\js\styles\monokai-sublime.css" />
+    <Content Include="themes\pyxill\assets\js\styles\mono-blue.css" />
+    <Content Include="themes\pyxill\assets\js\styles\magula.css" />
+    <Content Include="themes\pyxill\assets\js\styles\kimbie.light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\kimbie.dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\ir-black.css" />
+    <Content Include="themes\pyxill\assets\js\styles\idea.css" />
+    <Content Include="themes\pyxill\assets\js\styles\hybrid.css" />
+    <Content Include="themes\pyxill\assets\js\styles\hopscotch.css" />
+    <Content Include="themes\pyxill\assets\js\styles\gruvbox-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\gruvbox-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\grayscale.css" />
+    <Content Include="themes\pyxill\assets\js\styles\googlecode.css" />
+    <Content Include="themes\pyxill\assets\js\styles\github.css" />
+    <Content Include="themes\pyxill\assets\js\styles\github-gist.css" />
+    <Content Include="themes\pyxill\assets\js\styles\foundation.css" />
+    <Content Include="themes\pyxill\assets\js\styles\far.css" />
+    <Content Include="themes\pyxill\assets\js\styles\dracula.css" />
+    <Content Include="themes\pyxill\assets\js\styles\docco.css" />
+    <Content Include="themes\pyxill\assets\js\styles\default.css" />
+    <Content Include="themes\pyxill\assets\js\styles\darkula.css" />
+    <Content Include="themes\pyxill\assets\js\styles\dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\darcula.css" />
+    <Content Include="themes\pyxill\assets\js\styles\color-brewer.css" />
+    <Content Include="themes\pyxill\assets\js\styles\codepen-embed.css" />
+    <Content Include="themes\pyxill\assets\js\styles\brown-papersq.png" />
+    <Content Include="themes\pyxill\assets\js\styles\brown-paper.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atom-one-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atom-one-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-sulphurpool-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-sulphurpool-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-seaside-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-seaside-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-savanna-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-savanna-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-plateau-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-plateau-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-lakeside-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-lakeside-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-heath-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-heath-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-forest-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-forest-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-estuary-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-estuary-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-dune-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-dune-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-cave-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\atelier-cave-dark.css" />
+    <Content Include="themes\pyxill\assets\js\styles\ascetic.css" />
+    <Content Include="themes\pyxill\assets\js\styles\arta.css" />
+    <Content Include="themes\pyxill\assets\js\styles\arduino-light.css" />
+    <Content Include="themes\pyxill\assets\js\styles\androidstudio.css" />
+    <Content Include="themes\pyxill\assets\js\styles\agate.css" />
+    <Content Include="themes\pyxill\assets\js\highlight.pack.js" />
+    <Content Include="themes\pyxill\assets\css\combined-min.css" />
+    <Content Include="themes\poole\layout\tag_layout.eex" />
+    <Content Include="themes\poole\layout\tag_index.eex" />
+    <Content Include="themes\poole\layout\post.eex" />
+    <Content Include="themes\poole\layout\page.eex" />
+    <Content Include="themes\poole\layout\layout.eex" />
+    <Content Include="themes\poole\layout\index.eex" />
+    <Content Include="themes\poole\assets\css\03_lanyon.css" />
+    <Content Include="themes\poole\assets\css\02_syntax.css" />
+    <Content Include="themes\poole\assets\css\01_poole.css" />
+    <Content Include="themes\hyde\layout\post.cshtml" />
+    <Content Include="themes\hyde\layout\page.cshtml" />
+    <Content Include="themes\hyde\layout\layout.cshtml" />
+    <Content Include="themes\hyde\layout\index.cshtml" />
+    <Content Include="themes\hyde\assets\js\index.txt" />
+    <Content Include="themes\hyde\assets\img\favicon.png" />
+    <Content Include="themes\hyde\assets\img\apple-touch-icon-144-precomposed.png" />
+    <Content Include="themes\hyde\assets\css\syntax.css" />
+    <Content Include="themes\hyde\assets\css\poole.css" />
+    <Content Include="themes\hyde\assets\css\hyde.css" />
+    <Content Include="themes\beautifuld\layout\post.cshtml" />
+    <Content Include="themes\beautifuld\layout\page.cshtml" />
+    <Content Include="themes\beautifuld\layout\layout.cshtml" />
+    <Content Include="themes\beautifuld\layout\index.cshtml" />
+    <Content Include="themes\beautifuld\assets\js\main.js" />
+    <Content Include="themes\beautifuld\assets\js\jquery-1.11.2.min.js" />
+    <Content Include="themes\beautifuld\assets\js\highlight.min.js" />
+    <Content Include="themes\beautifuld\assets\js\bootstrap.min.js" />
+    <Content Include="themes\beautifuld\assets\img\favicon.ico" />
+    <Content Include="themes\beautifuld\assets\img\avatar-icon.png" />
+    <Content Include="themes\beautifuld\assets\css\pygment_highlights.css" />
+    <Content Include="themes\beautifuld\assets\css\main.css" />
+    <Content Include="themes\beautifuld\assets\css\highlight.min.css" />
+    <Content Include="themes\beautifuld\assets\css\bootstrap.min.css" />
+    <Content Include="themes\architect\layout\post.cshtml" />
+    <Content Include="themes\architect\layout\page.cshtml" />
+    <Content Include="themes\architect\layout\layout.cshtml" />
+    <Content Include="themes\architect\layout\index.cshtml" />
+    <Content Include="themes\architect\assets\img\sidebar-bg.jpg" />
+    <Content Include="themes\architect\assets\img\header-bg.jpg" />
+    <Content Include="themes\architect\assets\img\github-button.png" />
+    <Content Include="themes\architect\assets\img\download-button.png" />
+    <Content Include="themes\architect\assets\img\body-bg.jpg" />
+    <Content Include="themes\architect\assets\css\stylesheet.css" />
+    <Content Include="themes\architect\assets\css\pygment_trac.css" />
+    <Content Include="themes\architect\assets\css\print.css" />
+    <Content Include="robots.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CNAME">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jotter.Core\Jotter.Core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+  </ItemGroup>
+
+</Project>

@@ -4,6 +4,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jotter.Core", "Jotter.Core\
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jotter.Core.Tests", "Jotter.Core.Tests\Jotter.Core.Tests.fsproj", "{67C25FF2-1B99-4428-ABD8-218892B68751}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jotter.Console", "Jotter.Console\Jotter.Console.fsproj", "{3B3491EA-5B6E-4C7D-B388-3A8BDBCAF304}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{67C25FF2-1B99-4428-ABD8-218892B68751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67C25FF2-1B99-4428-ABD8-218892B68751}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67C25FF2-1B99-4428-ABD8-218892B68751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B3491EA-5B6E-4C7D-B388-3A8BDBCAF304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B3491EA-5B6E-4C7D-B388-3A8BDBCAF304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B3491EA-5B6E-4C7D-B388-3A8BDBCAF304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B3491EA-5B6E-4C7D-B388-3A8BDBCAF304}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
