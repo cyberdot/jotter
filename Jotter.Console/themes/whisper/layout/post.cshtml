@@ -1,4 +1,3 @@
-@model Jotter.Core.Post.PostViewModel
 
 <main id="content" class="content" role="main">
 <article class="post post-template  @Model.frontmatter.tags">
@@ -9,16 +8,16 @@
 				@Model.frontmatter.created.ToString(Model.config.dateFormat)
 			</time>  
 			@if (Model.frontmatter.tags.Length > 0) {
-			on
+			<text>on</text>
 				@foreach(var tag in Model.frontmatter.tags) {
-					<a href="/tags/@tag.html">@tag</a> 
+					<a href="/tags/@(tag).html">@tag</a> 
 				}			
 			}	
         </section>
      </header>
 	 
 	<section class="post-content">
-		@Model.content
+		@Raw(Model.content)
 	</section>
 	<footer class="post-footer">	
 		<figure class="author-image">
@@ -53,7 +52,7 @@
 
     </footer>
 	@if (Model.config.enableDisqusComments) {
-		Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl)	 
+		Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl);	 
 	}
 </article>
 </main>

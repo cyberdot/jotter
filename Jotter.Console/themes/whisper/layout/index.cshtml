@@ -1,5 +1,3 @@
-@model Jotter.Core.Index.IndexViewModel
-
 
 <div class="extra-pagination inner">
     <nav class="pagination" role="navigation">
@@ -8,7 +6,7 @@
 	}
 	<span class="page-number">
 		@if (Model.current > 1) {
-			Page @Model.current
+			<text>Page</text> @Model.current
 		}
 	</span>
 	@if (Model.next > 0) {
@@ -22,18 +20,18 @@
    
 	<article class="post @post.frontmatter.tags featured">
 		<header class="post-header">
-			<h2 class="post-title"><a href="@post.filename">@post.frontmatter.title</a></h2>
+			<h2 class="post-title"><a href="posts/@post.filename">@post.frontmatter.title</a></h2>
 		</header>
 		<section class="post-excerpt">
-			<p>@post.excerpt<a class="read-more" href="@post.filename">&raquo;</a></p>
+			<p>@post.excerpt<a class="read-more" href="posts/@post.filename">&raquo;</a></p>
 		</section>
 		<footer class="post-meta">
 			<img class="author-thumb" src="/assets/img/logo.png" alt="@Model.config.author" nopin="nopin" />
-			<a href="about.html">@Model.config.author</a>
+			<a href="/about.html">@Model.config.author</a>
 			@if (post.frontmatter.tags.Length > 0) {
-			    on
+			    <text>on</text>
 				@foreach(var tag in post.frontmatter.tags) {
-					<a href="/tags/@tag.html">@tag</a> 
+					<a href="/tags/@(tag).html">@tag</a> 
 				}			
 			}			
 			
@@ -53,7 +51,7 @@
 	}
 	<span class="page-number">
 		@if (Model.current > 1) {
-			Page @Model.current
+			<text>Page</text> @Model.current
 		}
 	</span>
 	@if (Model.next > 0) {

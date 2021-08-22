@@ -1,4 +1,4 @@
-@model Jotter.Core.Document.ILayoutViewModel
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -7,7 +7,7 @@
 	<meta name="generator" content="Jotter 0.1.0"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 	<title>@Model.config.name</title>
-	@Model.css
+	@Raw(Model.css)
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/img/apple-touch-icon-144-precomposed.png">
 	<link rel="shortcut icon" href="assets/img/favicon.png">
@@ -28,7 +28,7 @@
 			</div>
 		</div>
 		<div class="content container">
-			@Model.content
+			@Raw(Model.content)
 		</div>
 </body>
 </html>

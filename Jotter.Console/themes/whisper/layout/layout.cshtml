@@ -1,4 +1,4 @@
-@model Jotter.Core.Document.ILayoutViewModel
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +15,7 @@
 
     <link rel="shortcut icon" href="/favicon.ico">
 	
-	@Model.css
+	@Raw(Model.css)
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
 
     <link rel="canonical" href="@Model.config.url" />
@@ -29,16 +29,16 @@
     <meta property="og:url" content="@Model.config.url" />
        
     <script type="application/ld+json">
-	{
-		"@context": "http://schema.org",
-		"@type": "Website",
+	<text>{</text>
+		"@@context": "http://schema.org",
+		"@@type": "Website",
 		"publisher": "@Model.config.name",
 		"url": "@Model.config.url",
 		"description": "@Model.config.description"
-	}
+	<text>}</text>
     </script>
 
-    <meta name="generator" content="Dnevnik-1.0" />
+    <meta name="generator" content="Jotter-1.0" />
     <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="@Model.config.url/blog.rss" />
 </head>
 <body class="home-template nav-closed">
@@ -69,17 +69,17 @@
 		</header>
 
 		<main id="content" class="content" role="main">
-			@Model.content			
+			@Raw(Model.content)			
 		</main>
 
         <footer class="site-footer clearfix">
             <section class="copyright"><a href="@Model.config.url">@Model.config.name</a> &copy; 2017</section>
-            <section class="poweredby">Proudly published with <a href="https://github.com/cyberdot/dnevnik">Dnevnik</a></section>
+            <section class="poweredby">Proudly published with <a href="https://github.com/cyberdot/jotter">Jotter</a></section>
         </footer>
 
     </div>
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>  
-	@Model.js
+	@Raw(Model.js)
 </body>
 </html>

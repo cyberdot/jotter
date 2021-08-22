@@ -1,11 +1,10 @@
-@model Jotter.Core.Index.IndexViewModel
 
 @foreach(var post in Model.content) {
 
 <div class="posts">
 	<div class="post">
 		<h1 class="post-title">
-			<a href="@post.filename"> @post.frontmatter.title</a>
+			<a href="posts/@post.filename"> @post.frontmatter.title</a>
 		</h1>
 		<span class="post-date">@post.frontmatter.created.ToString(Model.config.dateFormat)</span>
 		@post.excerpt
@@ -21,7 +20,7 @@
 	}
 	<span class="page-number">
 		@if (Model.current > 1) {
-			Page @Model.current
+		   <text>Page</text> @Model.current
 		}
 	</span>
 	@if (Model.next > 0) {

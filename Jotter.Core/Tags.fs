@@ -104,17 +104,20 @@ module Tags =
         let (layout, layoutRenderer) = Layout.layout()
         let (index, indexRenderer) = Layout.tagIndex()
         
-        let indexView = Renderer.render index {| content = tags; |} indexRenderer
-        let layoutModel = {|
-            config = Config.data();
-            content = indexView;
-            filename = "index.html"
-            css = Assets.css();        
-        |}
+        if (index <> null) then
+            let indexView = Renderer.render index {| content = tags; |} indexRenderer
+            let layoutModel = {|
+                 config = Config.data();
+                 content = indexView;
+                 filename = "index.html"
+                 css = Assets.css();        
+            |}
 
-        let path = $"{Config.publicDirectory}/tags/index.html"
-        let renderedView = Renderer.render layout layoutModel layoutRenderer
-        File.WriteAllText(path, renderedView)
+            let path = $"{Config.publicDirectory}/tags/index.html"
+            let renderedView = Renderer.render layout layoutModel layoutRenderer
+            File.WriteAllText(path, renderedView)
+            true
+        else false
 
     let create (posts: Post list) =       
 
@@ -123,8 +126,9 @@ module Tags =
                     |> Array.concat
                     |> Array.distinct
                     |> Array.sort
-        createTagsIndexPage tags
-        tags |> Array.iter (fun t -> renderPostsPerTag t posts)
+        let isCreated = createTagsIndexPage tags
+        if (isCreated = true) then
+            tags |> Array.iter (fun t -> renderPostsPerTag t posts)
         
     let setup () =
          

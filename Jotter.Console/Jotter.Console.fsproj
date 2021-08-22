@@ -182,12 +182,6 @@
     <Content Include="themes\architect\assets\css\stylesheet.css" />
     <Content Include="themes\architect\assets\css\pygment_trac.css" />
     <Content Include="themes\architect\assets\css\print.css" />
-    <Content Include="robots.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="CNAME">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

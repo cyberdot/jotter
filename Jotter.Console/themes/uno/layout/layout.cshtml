@@ -1,4 +1,3 @@
-@model Jotter.Core.Document.ILayoutViewModel
 <!DOCTYPE html>
 <html>
   <head>
@@ -46,7 +45,7 @@
   <meta name="msapplication-TileImage" content="assets/img/favicons/mstile-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
-  @Model.css
+  @Raw(Model.css)
   <link rel="canonical" href="@Model.config.url">
   <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="/blog.rss">
 </head>
@@ -133,7 +132,7 @@
 
 <div class="content-wrapper">
 	<div class="content-wrapper__inner">
-		@Model.content
+		@Raw(Model.content)
 	</div>
 
 
@@ -144,6 +143,6 @@
 </div>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-@Model.js
+@Raw(Model.js)
 </body>
 </html>

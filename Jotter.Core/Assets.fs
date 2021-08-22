@@ -17,7 +17,7 @@ module Assets =
         let dirInfo = new DirectoryInfo(dir)
         let files = dirInfo.GetFiles(".", SearchOption.AllDirectories)
         files |> Seq.sortBy (fun f -> f.Name)
-              |> Seq.map (fun f -> $"assets/css/{f.Name}")
+              |> Seq.map (fun f -> $"/assets/css/{f.Name}")
               |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
               
     let private jsFiles (dir: string) =

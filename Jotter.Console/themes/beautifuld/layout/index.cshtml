@@ -1,18 +1,16 @@
-@model Jotter.Core.Index.IndexViewModel
-
 <div role="main" class="container">
 	<div class="row">
 		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 			<div class="posts-list">
 				 @foreach(var post in Model.content) {
 					<article class="post-preview">
-						<a href="@post.filename">
+						<a href="posts/@post.filename">
 							<h2 class="post-title">@post.frontmatter.title</h2>
 							<h3 class="post-subtitle"></h3>
 						</a>
-						<p class="post-meta">Posted on @post.frontmatter.created.ToString(Model.config.date_format)</p>
+						<p class="post-meta">Posted on @post.frontmatter.created.ToString(Model.config.dateFormat)</p>
 						<div class="post-entry">
-							<a href="@post.filename" class="post-read-more">[Read&nbsp;More]</a>
+							<a href="posts/@post.filename" class="post-read-more">[Read&nbsp;More]</a>
 						</div>
 					</article>
 				 }

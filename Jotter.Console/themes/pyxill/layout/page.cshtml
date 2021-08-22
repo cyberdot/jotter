@@ -1,9 +1,7 @@
-@model Jotter.Core.Page.PageViewModel
-
 <div class="post-header mb2">
 	<h1 class="py2">@Model.frontmatter.title</h1>
 </div>
 <article class="post-content">
-	@Model.content
+	@Raw(Model.content)
 </article>
 			

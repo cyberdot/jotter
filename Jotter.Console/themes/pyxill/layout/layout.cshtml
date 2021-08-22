@@ -1,5 +1,3 @@
-@model Jotter.Core.Document.ILayoutViewModel
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,17 +9,17 @@
 	<meta name="author" content="@Model.config.author">
 	<meta name="keywords" content="">
 	<link rel="canonical" href="@Model.path">
-	@Model.css	
+	@Raw(Model.css)	
 </head>
 <body>
 	<div class="site-wrap">
 		<header class="site-header px2 px-responsive">
 			<div class="mt2 wrap">
 				<div class="measure">
-					<a href="@Model.filename" class="site-title">@Model.config.name</a>
+					<a href="@Model.config.url" class="site-title">@Model.config.name</a>
 					<nav class="site-nav right">
-						<a href="about.html">About</a>
-						<a href="tags.html">Tags</a>
+						<a href="/about.html">About</a>
+						<a href="/tags.html">Tags</a>
 						<a href="mailto:@Model.config.email">Contact</a>
 					</nav>
 					<div class="clearfix"></div>
@@ -30,7 +28,7 @@
 		</header>
 		<div class="post p2 p-responsive wrap" role="main">
 			<div class="measure">
-				@Model.content
+				@Raw(Model.content)
 			</div>
 		</div>
 	</div>
@@ -41,12 +39,12 @@
 					<a class="fa fa-rss rss" href="blog.rss"></a>
 				</nav>
 				<small> 
-					Copyright &#169; 2017<br /> Powered by <a href="http://github.com/cyberdot/dnevnik" target="_blank">Dnevnik</a> &amp; Pixyll
+					Copyright &#169; 2017<br /> Powered by <a href="http://github.com/cyberdot/jotter" target="_blank">Jotter</a> &amp; Pixyll
 				</small>
 			</div>
 		</div>
 	</footer>
-	@Model.js
+	@Raw(Model.js)
 	<script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>

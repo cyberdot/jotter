@@ -41,19 +41,19 @@ module Config =
     
     let filePath = $"{contentDirectory}/{configFile}"
     
-    let private defaultConfig = """
+    let private defaultConfig (theme: string) = $"""
     
-    { 
+    {{ 
       "name": "A brand new static site", 
       "author": "author_name",
       "author_description": "Author's description, skills, etc", 
       "author_location": "Location", 
-      "url": "http://localhost:4000", 
+      "url": "http://localhost:5000", 
       "description": "Your site description", 
       "language": "en-gb", 
       "posts_per_page": 10, 
       "sort_posts": "ascending", 
-      "theme": "poole", 
+      "theme": "{theme}", 
 	  "date_format": "dd MMM yyyy", 
 	  "github": "github_account_name", 
 	  "twitter": "twitter_account_name", 
@@ -61,13 +61,13 @@ module Config =
 	  "email": "user_email@email-provider.com", 
 	  "disqus_url": "disqus_username.disqus.com", 
       "enable_disqus_comments": true 
-    }
+    }}
     
     """
 
     let private loadConfig (content: string) = JsonConvert.DeserializeObject<ConfigurationModel>(content)
 
-    let init () = File.WriteAllText(filePath, defaultConfig)
+    let init (theme: string) = File.WriteAllText(filePath, (defaultConfig theme))
 
     let data () = File.ReadAllText(filePath) |> loadConfig      
         

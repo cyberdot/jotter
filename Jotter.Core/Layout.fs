@@ -36,7 +36,11 @@ module Layout =
         
     let private load (template: string) (fallback: string) =
        let fileP = template |> toFileName |> toPath
-       fileP |> read fallback |> determineRenderer
+       if(fileP = null && System.String.IsNullOrWhiteSpace(fallback)) then
+           (null, null)
+       else
+           fileP |> read fallback |> determineRenderer
+
     
     let private resolveLayout (template: string) = load template "layout"  
     

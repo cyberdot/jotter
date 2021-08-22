@@ -1,5 +1,3 @@
-@model Jotter.Core.Post.PostViewModel
-
 <div class="post-header mb2">
 	<h1 class="py2">@Model.frontmatter.title</h1>
 	<span class="post-meta">
@@ -7,16 +5,16 @@
 	</span><br>
 </div>
 <article class="post-content"> 
-	@Model.content
+	@Raw(Model.content)
 </article>
 <p class="post-meta">Tags:&nbsp; 
 	@if (Model.frontmatter.tags.Length > 0) {
 	       @foreach(var tag in Model.frontmatter.tags) {
-			<a href="/tags/@tag.html">@tag,</a> 
+			<a href="/tags/@(tag).html">@tag,</a> 
 	       }					
 	}
 </p>
 
 @if (Model.config.enableDisqusComments) {
-	Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl)	 
+	Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl);	 
 }

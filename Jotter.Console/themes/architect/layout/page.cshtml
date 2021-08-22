@@ -1,6 +1,5 @@
-@model Jotter.Core.Page.PageViewModel
 
 <h2>@Model.frontmatter.title</h2>
-<p class="meta">@Modelfrontmatter.created</p>
-@Model.content
+<p class="meta">@Model.frontmatter.created</p>
+@Raw(Model.content)
     

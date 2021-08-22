@@ -8,8 +8,8 @@ open Jotter.Core.Theme
 module Site =
    
    let private copyRootFiles ()=
-       File.Copy("robots.txt", $"{Config.contentDirectory}/robots.txt")
-       File.Copy("CNAME", $"{Config.contentDirectory}/CNAME")
+       File.Copy("site_files/robots.txt", $"{Config.contentDirectory}/robots.txt")
+       File.Copy("site_files/CNAME", $"{Config.contentDirectory}/CNAME")
 
    let clean ()=       
        printfn "Setting up %s" Config.contentDirectory
@@ -36,10 +36,10 @@ module Site =
        Post.setup()
        Tags.setup()
 
-   let init ()=
+   let init (theme: string)=
        clean()
        copyRootFiles()
-       Config.init()
+       Config.init theme
        Theme.init()
        Draft.init()
        Page.init()

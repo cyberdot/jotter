@@ -1,4 +1,4 @@
-@model. Jotter.Core.Page.PageViewModel
+
 <article class="post-container post-container--single">
 	<header class="post-header">
 		<div class="post-meta">
@@ -10,7 +10,7 @@
 	</header>
 
 	<section class="post">
-		@Model.content
+		@Raw(Model.content)
 	</section>
 
 </article>

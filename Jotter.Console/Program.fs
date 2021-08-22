@@ -11,7 +11,8 @@ let main argv =
     let root = RootCommand()
     
     let initCmd = Command("init", "Create the scaffolding for the static site")
-    initCmd.Handler <- CommandHandler.Create(Action(fun _ -> Jotter.Core.Site.init()))
+    initCmd.AddArgument(Argument<string>("theme", "Blog theme"))
+    initCmd.Handler <- CommandHandler.Create<string>(Action<string>(fun theme -> Jotter.Core.Site.init theme))
     root.AddCommand(initCmd)
 
     
