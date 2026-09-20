@@ -43,8 +43,8 @@ module Index =
     let private createLayoutViewModel (content: string) (config: ConfigurationModel) =
         {
            config = config; 
-           js = Assets.js(); 
-           css = Assets.css(); 
+           js = Assets.js("."); 
+           css = Assets.css("."); 
            content = content;
         }
         

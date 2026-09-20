@@ -44,8 +44,8 @@ module Tags =
     let private createLayoutViewModel (content: string) (config: ConfigurationModel) (tag: string) =
         {
            config = config;
-           js = Assets.js();
-           css = Assets.css();
+           js = Assets.js(".");
+           css = Assets.css(".");
            content = content;
            tag = tag;
            path = "";
@@ -110,7 +110,7 @@ module Tags =
                  config = Config.data();
                  content = indexView;
                  filename = "index.html"
-                 css = Assets.css();        
+                 css = Assets.css(".");        
             |}
 
             let path = $"{Config.publicDirectory}/tags/index.html"

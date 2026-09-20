@@ -53,8 +53,8 @@ module Page =
     let private layoutViewModel (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
         {
            config = Config.data();
-           js = Assets.js();
-           css = Assets.css();
+           js = Assets.js("..");
+           css = Assets.css("..");
            content = content;
            frontmatter = frontmatter;
            path = path;

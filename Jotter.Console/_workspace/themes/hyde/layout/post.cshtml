@@ -1,0 +1,10 @@
+<div class="post">
+	<h1>@Model.frontmatter.title</h1>
+	<span class="post-date">@Model.frontmatter.created.ToString(Model.config.dateFormat)</span>
+	@Raw(Model.content)
+</div>
+
+@if (Model.config.enableDisqusComments) {
+	Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl);	 
+}
+

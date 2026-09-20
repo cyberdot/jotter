@@ -73,8 +73,8 @@ module Post =
         
         let dvm = {
                      config = Config.data();
-                     js = Assets.js();
-                     css = Assets.css();
+                     js = Assets.js("..");
+                     css = Assets.css("..");
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;

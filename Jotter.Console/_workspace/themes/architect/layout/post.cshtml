@@ -1,0 +1,10 @@
+<div>
+	<h2><@Model.frontmatter.title</h2>
+	<p class="meta">@Model.frontmatter.created</p>
+	@Raw(Model.content)
+</div>
+
+
+@if(Model.config.enableDisqusComments) { 
+	Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl);	 
+}

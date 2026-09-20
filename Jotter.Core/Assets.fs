@@ -17,7 +17,7 @@ module Assets =
         let dirInfo = new DirectoryInfo(dir)
         let files = dirInfo.GetFiles(".", SearchOption.AllDirectories)
         files |> Seq.sortBy (fun f -> f.Name)
-              |> Seq.map (fun f -> $"/assets/css/{f.Name}")
+              |> Seq.map (fun f -> $"assets/css/{f.Name}")
               |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
               
     let private jsFiles (dir: string) =
@@ -27,21 +27,21 @@ module Assets =
               |> Seq.map (fun f -> $"assets/js/{f.Name}")
               |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
          
-    let css () =
+    let css (startPath: string) =
         let cssDir = $"{Config.publicDirectory}/assets/css"
         let exists = Directory.Exists(cssDir)
         match exists with
             | true -> let links = cssFiles(cssDir) 
-                                    |> Seq.map (fun f -> $"<link rel=\"stylesheet\" href=\"{f}\" />")
+                                    |> Seq.map (fun f -> $"<link rel=\"stylesheet\" href=\"{startPath}/{f}\" />")
                       String.Join("\n", links)                      
             | false -> String.Empty
      
-    let js () =
+    let js (startPath: string) =
         let jsDir = $"{Config.publicDirectory}/assets/js"
         let exists = Directory.Exists(jsDir)
         match exists with
             | true -> let links = jsFiles(jsDir)
-                                  |> Seq.map (fun f -> $"<script type=\"text/javascript\" src=\"{f}\"></script>")
+                                  |> Seq.map (fun f -> $"<script type=\"text/javascript\" src=\"{startPath}/{f}\"></script>")
                       String.Join("\n", links)
             | false -> String.Empty
             

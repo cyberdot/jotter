@@ -18,7 +18,7 @@ module Rss =
         let item = SyndicationItem()
         item.Title <- TextSyndicationContent(post.frontmatter.title)
         item.Summary <- TextSyndicationContent(post.frontmatter.description)
-        item.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(url)))
+        item.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(url, UriKind.RelativeOrAbsolute)))
         item
         
     let compileRss (posts: Post list) = posts |> Seq.map (fun p -> buildItem p)
