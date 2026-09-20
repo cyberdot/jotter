@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Jotter.Console/Jotter.Console.fsproj" />
+  <Project Path="src/Jotter.Core.Tests/Jotter.Core.Tests.fsproj" Id="073356c5-880c-4358-84c5-d776791661a7" />
+  <Project Path="src/Jotter.Core/Jotter.Core.fsproj" />
+</Solution>
