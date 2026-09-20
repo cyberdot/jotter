@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<WarnOn>3390;$(WarnOn)</WarnOn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="IOUtils.fs" />
+		<Compile Include="Config.fs" />
+		<Compile Include="Document.fs" />
+		<Compile Include="Renderer.fs" />
+		<Compile Include="IndexPager.fs" />
+		<Compile Include="Theme.fs" />
+		<Compile Include="Layout.fs" />
+		<Compile Include="Assets.fs" />
+		<Compile Include="GA.fs" />
+		<Compile Include="DisqusComments.fs" />
+		<Compile Include="Store.fs" />
+		<Compile Include="Page.fs" />
+		<Compile Include="Post.fs" />
+		<Compile Include="Posts.fs" />
+		<Compile Include="Rss.fs" />
+		<Compile Include="Draft.fs" />
+		<Compile Include="Index.fs" />
+		<Compile Include="SiteMap.fs" />
+		<Compile Include="Tags.fs" />
+		<Compile Include="Site.fs" />
+		<Compile Include="Tasks\BuildTask.fs" />
+		<Compile Include="Tasks\DraftTask.fs" />
+		<Compile Include="Tasks\PageTask.fs" />
+		<Compile Include="Tasks\PostTask.fs" />
+		<Compile Include="Tasks\ServerTask.fs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FSharp.Formatting" Version="20.0.1" />
+		<PackageReference Include="Giraffe" Version="6.4.0" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="RazorLight" Version="2.3.1" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+		<PackageReference Include="System.ServiceModel.Syndication" Version="8.0.0" />
+	</ItemGroup>
+
+</Project>
