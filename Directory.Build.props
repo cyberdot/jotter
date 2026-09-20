@@ -1,0 +1,14 @@
+<Project>
+
+	<PropertyGroup>
+		<!--
+		  FSharp.Formatting 22.2.0 depends on FSharp.Compiler.Service 43.12.204, which pins an exact
+		  FSharp.Core version (10.1.204). The .NET 10 SDK's F# tooling implicitly references a newer
+		  FSharp.Core patch release (10.1.401), which NuGet resolves instead. FSharp.Core patch releases
+		  are backward compatible, so this is safe to ignore; no newer FSharp.Formatting release is
+		  available to fix the pin upstream.
+		-->
+		<NoWarn>$(NoWarn);NU1608</NoWarn>
+	</PropertyGroup>
+
+</Project>

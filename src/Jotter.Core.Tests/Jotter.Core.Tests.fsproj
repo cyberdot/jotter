@@ -11,7 +11,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="TestHelpers.fs" />
+    <Compile Include="IOUtilsTests.fs" />
+    <Compile Include="IndexPagerTests.fs" />
+    <Compile Include="StoreTests.fs" />
+    <Compile Include="DocumentTests.fs" />
+    <Compile Include="GATests.fs" />
+    <Compile Include="DisqusCommentsTests.fs" />
+    <Compile Include="IndexTests.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Unquote" Version="7.0.1" />
     <PackageReference Include="xunit.v3.mtp-v2" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jotter.Core\Jotter.Core.fsproj" />
   </ItemGroup>
 
 </Project>

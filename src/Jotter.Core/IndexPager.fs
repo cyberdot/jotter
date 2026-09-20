@@ -16,7 +16,7 @@ module IndexPager =
         else
             let rootPath = Path.ChangeExtension(page, null)
             let ext = Path.GetExtension(page)
-            (num, $"{rootPath}{num}.{ext}")
+            (num, $"{rootPath}{num}{ext}")
     
     let totalPages (postsCount: int) =
         let config = Config.data()
