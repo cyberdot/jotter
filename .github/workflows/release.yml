@@ -1,0 +1,114 @@
+name: Release
+
+# Builds and tests master, publishes versioned Jotter.Console executables for
+# Windows, Linux, and macOS (x64), tags master with that version, and creates
+# a GitHub release with the executables attached.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 1.4.0 or v1.4.0. Leave empty to auto-increment the patch version from the latest release tag."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Determine release version
+        id: version
+        run: |
+          $inputVersion = "${{ inputs.version }}"
+
+          if ($inputVersion) {
+            $version = $inputVersion -replace '^v', ''
+            if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+              Write-Output "::error::'$inputVersion' is not a valid version. Expected X.Y.Z or vX.Y.Z."
+              exit 1
+            }
+          } else {
+            $latestTag = git tag --list 'v*.*.*' --sort=-v:refname | Select-Object -First 1
+            if (-not $latestTag) {
+              $version = "0.1.0"
+            } else {
+              $parts = ($latestTag -replace '^v', '') -split '\.'
+              $version = "$($parts[0]).$($parts[1]).$([int]$parts[2] + 1)"
+            }
+          }
+
+          $tag = "v$version"
+
+          git rev-parse $tag 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "::error::Tag $tag already exists."
+            exit 1
+          }
+
+          Write-Output "Releasing $tag"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$version"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "tag=$tag"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore Jotter.slnx
+
+      - name: Build
+        run: dotnet build Jotter.slnx --configuration Release --no-restore -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Test
+        run: dotnet test Jotter.slnx --configuration Release --no-build
+
+      - name: Publish console executables
+        id: publish
+        run: |
+          $rids = @("win-x64", "linux-x64", "osx-x64")
+          $assets = @()
+
+          foreach ($rid in $rids) {
+            $outDir = "publish/$rid"
+
+            dotnet publish src/Jotter.Console/Jotter.Console.fsproj `
+              --configuration Release `
+              --runtime $rid `
+              --self-contained true `
+              -p:PublishSingleFile=true `
+              -p:IncludeNativeLibrariesForSelfExtract=true `
+              -p:Version=${{ steps.version.outputs.version }} `
+              -o $outDir
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+            $asset = "Jotter-${{ steps.version.outputs.tag }}-$rid.zip"
+            Compress-Archive -Path "$outDir/*" -DestinationPath $asset
+            $assets += $asset
+          }
+
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "assets=$($assets -join ' ')"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $assets = "${{ steps.publish.outputs.assets }}" -split ' '
+          gh release create "${{ steps.version.outputs.tag }}" `
+            @assets `
+            --title "${{ steps.version.outputs.tag }}" `
+            --target master `
+            --generate-notes

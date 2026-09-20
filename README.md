@@ -96,6 +96,19 @@ dotnet run --project src/Jotter.Console -- server
 dotnet test Jotter.slnx
 ```
 
+## CI/CD
+
+Two GitHub Actions workflows live under `.github/workflows`:
+
+- **Build and Test** (`build.yml`) — builds the solution and runs the full test suite on every branch
+  push and on every pull request opened or updated. A merged PR is covered too, since merging pushes
+  a commit to the base branch.
+- **Release** (`release.yml`) — manually triggered (`workflow_dispatch`). Builds and tests `master`,
+  publishes a self-contained, versioned `Jotter.Console.exe` (win-x64), tags `master` with that
+  version, and creates a GitHub release with the executable attached and auto-generated release
+  notes. Pass a `version` input (e.g. `1.4.0`) to set it explicitly, or leave it empty to auto-increment
+  the patch version from the latest `vX.Y.Z` tag.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
