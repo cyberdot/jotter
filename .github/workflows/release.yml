@@ -90,6 +90,7 @@ jobs:
               --runtime $rid `
               --self-contained true `
               -p:PublishSingleFile=true `
+              -p:PublishReadyToRun=true `
               -p:IncludeNativeLibrariesForSelfExtract=true `
               -p:Version=${{ steps.version.outputs.version }} `
               -o $outDir

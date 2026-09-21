@@ -45,6 +45,14 @@ let main argv =
     draftCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.DraftTask.run (pr.GetValue(draftTitleArg))))
     root.Add(draftCmd)
 
+    let publishCmd = Command("publish", "Move a draft into published posts")
+    let publishTitleArg = Argument<string>("title")
+    publishTitleArg.Description <- "Draft title"
+
+    publishCmd.Add(publishTitleArg)
+    publishCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.PublishTask.run (pr.GetValue(publishTitleArg))))
+    root.Add(publishCmd)
+
     let serverCmd = Command("server", "Start a local server to view the blog")
     serverCmd.SetAction(Action<ParseResult>(fun _ -> Jotter.Core.ServerTask.run()))
     root.Add(serverCmd)

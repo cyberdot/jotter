@@ -2,6 +2,8 @@ namespace Jotter.Core
 
 open System
 open System.IO
+open System.Net
+open System.Text.RegularExpressions
 open Newtonsoft.Json
 open Jotter.Core.Config
 
@@ -60,13 +62,22 @@ module Document =
         let frontMatter = JsonConvert.DeserializeObject<FrontMatter>(parts.[0] + "}")
         (frontMatter, parts.[1])
         
+    // Truncating rendered HTML by raw character count can slice through a tag or attribute
+    // (e.g. `<a href="...`), corrupting the excerpt's markup. Stripping tags first and decoding
+    // entities gives a plain-text excerpt that is safe to truncate anywhere and renders correctly
+    // whether or not the theme wraps it in @Raw.
     let createExcerpt (content: string) =
-        let length = content.Length
-        let maxLength = match length with
-                          |  i when i > 1_000 -> 1_000
-                          | _ -> length
-        let excerpt = content.Substring(0, maxLength)
-        $"{excerpt} ..."
+        let plainText = content |> fun c -> Regex.Replace(c, "<[^>]*>", String.Empty) |> WebUtility.HtmlDecode
+
+        let excerpt =
+            if plainText.Length <= 1_000 then
+                plainText
+            else
+                let truncated = plainText.Substring(0, 1_000)
+                let lastSpace = truncated.LastIndexOf(' ')
+                if lastSpace > 0 then truncated.Substring(0, lastSpace) else truncated
+
+        $"{excerpt.Trim()} ..."
         
     
 

@@ -94,6 +94,11 @@ module Page =
     let prepare (mdFile: string) (pages: Page list) =
         let page = preparePage mdFile
         Store.addPages pages [page]
+
+    // Building the full list in one pass keeps this O(n) - threading each file through
+    // `prepare` in a loop would call Store.addPages (an O(n) list append) once per file.
+    let prepareAll (files: string seq) : Page list =
+        files |> Seq.map preparePage |> Seq.toList
     
     let create (title: string) =
         let path = title |> IOUtils.filenameFromTitle pagesDir

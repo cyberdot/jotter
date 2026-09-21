@@ -12,5 +12,5 @@ module Theme =
     let init () =
         let dir = $"{Config.contentDirectory}/themes"
         Directory.CreateDirectory(dir) |> ignore
-        copyDirectory "themes" dir
+        copyDirectory (IOUtils.resolveAppPath "themes") dir
 

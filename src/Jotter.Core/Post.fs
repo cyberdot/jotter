@@ -94,6 +94,11 @@ module Post =
     let prepare (mdFile: string) (posts: Post list) =
         let post = preparePage mdFile
         Store.addPosts posts [post]
+
+    // Building the full list in one pass keeps this O(n) - threading each file through
+    // `prepare` in a loop would call Store.addPosts (an O(n) list append) once per file.
+    let prepareAll (files: string seq) : Post list =
+        files |> Seq.map preparePage |> Seq.toList
         
        
     let create (title: string) (isDraft: bool) =

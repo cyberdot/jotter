@@ -4,12 +4,13 @@ open System
 open System.IO
 open Jotter.Core.Config
 open Jotter.Core.Theme
+open Jotter.Core.IOUtils
 
 module Site =
    
    let private copyRootFiles ()=
-       File.Copy("site_files/robots.txt", $"{Config.contentDirectory}/robots.txt")
-       File.Copy("site_files/CNAME", $"{Config.contentDirectory}/CNAME")
+       File.Copy(IOUtils.resolveAppPath "site_files/robots.txt", $"{Config.contentDirectory}/robots.txt")
+       File.Copy(IOUtils.resolveAppPath "site_files/CNAME", $"{Config.contentDirectory}/CNAME")
 
    let clean ()=       
        printfn "Setting up %s" Config.contentDirectory

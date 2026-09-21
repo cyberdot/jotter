@@ -41,3 +41,21 @@ let ``createExcerpt truncates long content to 1000 characters before the ellipsi
 
     test <@ excerpt.Length = 1_004 @>
     test <@ excerpt.EndsWith(" ...") @>
+
+[<Fact>]
+let ``createExcerpt strips HTML tags instead of truncating through them`` () =
+    test <@ Document.createExcerpt "<p>Hello <strong>world</strong></p>" = "Hello world ..." @>
+
+[<Fact>]
+let ``createExcerpt decodes HTML entities`` () =
+    test <@ Document.createExcerpt "Fish &amp; chips" = "Fish & chips ..." @>
+
+[<Fact>]
+let ``createExcerpt truncates long content on a word boundary instead of mid-word`` () =
+    // The cut falls at character 1000, which lands inside "lastword" - the whole word should be
+    // dropped rather than kept as a partial fragment.
+    let longContent = (String.replicate 995 "a") + " lastword"
+
+    let excerpt = Document.createExcerpt longContent
+
+    test <@ excerpt = (String.replicate 995 "a") + " ..." @>

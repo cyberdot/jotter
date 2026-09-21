@@ -1,9 +1,14 @@
 namespace Jotter.Core
 
+open System
 open System.IO;
 
 module IOUtils =
-    
+
+     // Bundled assets (themes, site_files) ship next to the executable, not in the current
+     // working directory - that's where the generated site lives instead.
+     let resolveAppPath (relativePath: string) = Path.Combine(AppContext.BaseDirectory, relativePath)
+
      let rec private copyAll (source: DirectoryInfo) (destination: DirectoryInfo) =
         
         let sourceFiles = source.GetFiles()
@@ -21,11 +26,12 @@ module IOUtils =
         
         copyAll sourceInfo destinationInfo
         
-     let filenameFromTitle (directory: string) (title: string) =
-         let titlePart = title.ToLowerInvariant().Replace(" ", "-")
-         $"{directory}/{titlePart}.markdown"
-         
      let urlSlug (title: string) = title.ToLowerInvariant().Replace(" ", "-")
+
+     let slugFileName (title: string) = $"{urlSlug title}.markdown"
+
+     let filenameFromTitle (directory: string) (title: string) =
+         $"{directory}/{slugFileName title}"
      
    
             

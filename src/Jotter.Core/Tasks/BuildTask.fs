@@ -11,12 +11,9 @@ module BuildTask =
         Site.prepare()
         Assets.copy()
         
-        let mutable pages: Document.Page list = []
-        let mutable posts: Document.Post list = []
-        
-        for filepath in Page.list() do pages <- Page.prepare filepath pages
-        for filepath in Post.list() do posts <- Post.prepare filepath posts
-            
+        let pages = Page.list() |> Page.prepareAll
+        let posts = Post.list() |> Post.prepareAll
+
         pages |> Document.writeAllPages
         
         posts |> Tags.create

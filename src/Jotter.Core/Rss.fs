@@ -6,6 +6,7 @@ open Newtonsoft.Json.Linq
 open Jotter.Core.Config
 open System.ServiceModel.Syndication
 open Jotter.Core.Document
+open Jotter.Core.Posts
 
 module Rss =
     
@@ -18,6 +19,8 @@ module Rss =
         let item = SyndicationItem()
         item.Title <- TextSyndicationContent(post.frontmatter.title)
         item.Summary <- TextSyndicationContent(post.frontmatter.description)
+        item.PublishDate <- post.frontmatter.created
+        item.LastUpdatedTime <- post.frontmatter.created
         item.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(url, UriKind.RelativeOrAbsolute)))
         item
         
@@ -43,7 +46,7 @@ module Rss =
         rssFormatter.WriteTo(rssWriter)
         rssWriter.Close();
         
-    let create posts = posts |> buildFeed |> writeToFile
+    let create posts = posts |> Posts.sortByDate |> buildFeed |> writeToFile
         
         
         
