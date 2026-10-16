@@ -93,10 +93,13 @@ module Tags =
     let private createIndexPerTag (posts: Post list) (tag: string) (config: ConfigurationModel) =
         posts |> Posts.sortByDate |> compileIndex tag config 1
 
+    // Tags.create writes each tag's index to this path (via IOUtils.urlSlug), so any link
+    // pointing at a tag page must be built from the same function or the link 404s.
+    let tagIndexFileName (tag: string) = $"tags/{IOUtils.urlSlug tag}.html"
+
     let private renderPostsPerTag (tag: string) (posts: Post list) =
-        let slug = IOUtils.urlSlug tag
         let config = Config.data()
-        let updatedConfig = {config with blogIndex = $"tags/{slug}.html" }
+        let updatedConfig = {config with blogIndex = tagIndexFileName tag }
         let filteredPosts = List.filter (fun p -> Array.exists (fun x -> x = tag) p.frontmatter.tags) posts
         createIndexPerTag filteredPosts tag updatedConfig
 

@@ -19,6 +19,10 @@
     <Compile Include="GATests.fs" />
     <Compile Include="DisqusCommentsTests.fs" />
     <Compile Include="IndexTests.fs" />
+    <Compile Include="TagsTests.fs" />
+    <Compile Include="PostTests.fs" />
+    <Compile Include="PageTests.fs" />
+    <Compile Include="SiteMapTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
