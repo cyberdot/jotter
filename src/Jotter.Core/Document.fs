@@ -56,11 +56,38 @@ module Document =
               | true -> $"{Config.publicDirectory}/posts/{fileName}"
               | false -> $"{Config.publicDirectory}/{fileName}"
         
+    // Splitting on the first `}` corrupts front matter whose title or description contains one,
+    // e.g. `{"title": "Oops } Title", ...}`. Track brace depth and skip braces inside quoted
+    // strings so we find the `}` that actually closes the top-level JSON object.
+    let private findFrontMatterEnd (content: string) =
+        let mutable depth = 0
+        let mutable inString = false
+        let mutable escaped = false
+        let mutable endIndex = -1
+        let mutable i = 0
+        while endIndex = -1 && i < content.Length do
+            let c = content.[i]
+            if inString then
+                if escaped then escaped <- false
+                elif c = '\\' then escaped <- true
+                elif c = '"' then inString <- false
+            else
+                match c with
+                | '"' -> inString <- true
+                | '{' -> depth <- depth + 1
+                | '}' ->
+                    depth <- depth - 1
+                    if depth = 0 then endIndex <- i
+                | _ -> ()
+            i <- i + 1
+        endIndex
+
     let splitIntoParts (content: string) =
-        let separators = [|'}'|]
-        let parts = content.Split(separators, 2, StringSplitOptions.None)
-        let frontMatter = JsonConvert.DeserializeObject<FrontMatter>(parts.[0] + "}")
-        (frontMatter, parts.[1])
+        let endIndex = findFrontMatterEnd content
+        let frontMatterJson = content.Substring(0, endIndex + 1)
+        let body = content.Substring(endIndex + 1)
+        let frontMatter = JsonConvert.DeserializeObject<FrontMatter>(frontMatterJson)
+        (frontMatter, body)
         
     // Truncating rendered HTML by raw character count can slice through a tag or attribute
     // (e.g. `<a href="...`), corrupting the excerpt's markup. Stripping tags first and decoding

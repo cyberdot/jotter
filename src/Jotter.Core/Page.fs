@@ -2,6 +2,7 @@ namespace Jotter.Core
 
 open System
 open System.IO
+open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 open FSharp.Formatting.Markdown
 open Jotter.Core.Config
@@ -39,9 +40,9 @@ module Page =
     
     let defaultPage (title: string) =
         $"""
-        {{ 
-	       "title": "{title}", 
-	       "description": "A new page", 
+        {{
+	       "title": {JsonConvert.ToString(title)},
+	       "description": "A new page",
 	       "created": "{DateTimeOffset.UtcNow.ToString("o")}",
 	       "tags": ["page", "new"], 
 	       "slug": "{IOUtils.urlSlug(title)}"

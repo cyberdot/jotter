@@ -30,6 +30,16 @@ let ``splitIntoParts parses the JSON front matter and returns the remaining body
     test <@ body = "\nBody content here." @>
 
 [<Fact>]
+let ``splitIntoParts handles a closing brace inside a front matter value`` () =
+    let content =
+        "{\"title\":\"My } Post\",\"description\":\"D\",\"created\":\"2024-01-01T00:00:00+00:00\",\"tags\":[\"a\"],\"slug\":\"my-post\"}\nBody."
+
+    let (frontMatter, body) = Document.splitIntoParts content
+
+    test <@ frontMatter.title = "My } Post" @>
+    test <@ body = "\nBody." @>
+
+[<Fact>]
 let ``createExcerpt appends an ellipsis to short content unchanged`` () =
     test <@ Document.createExcerpt "short text" = "short text ..." @>
 

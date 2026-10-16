@@ -2,6 +2,7 @@ namespace Jotter.Core
 
 open System
 open System.IO
+open Newtonsoft.Json
 open FSharp.Formatting.Markdown
 open Jotter.Core.Config
 open Jotter.Core.IOUtils
@@ -38,7 +39,7 @@ module Post =
     let private defaultPost (title: string) =
         $"""
         {{
-          "title": "{title}",
+          "title": {JsonConvert.ToString(title)},
           "description": "A new blog post",
           "created": "{DateTimeOffset.UtcNow.ToString("o")}",
           "tags": ["post", "new"],
