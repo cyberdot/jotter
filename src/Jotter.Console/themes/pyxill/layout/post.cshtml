@@ -10,7 +10,7 @@
 <p class="post-meta">Tags:&nbsp; 
 	@if (Model.frontmatter.tags.Length > 0) {
 	       @foreach(var tag in Model.frontmatter.tags) {
-			<a href="/tags/@(tag).html">@tag,</a> 
+			<a href="/tags/@(Jotter.Core.IOUtils.urlSlug(tag)).html">@tag,</a>
 	       }					
 	}
 </p>

@@ -96,7 +96,7 @@ module Tags =
     let private renderPostsPerTag (tag: string) (posts: Post list) =
         let slug = IOUtils.urlSlug tag
         let config = Config.data()
-        let updatedConfig = {config with blogIndex = $"tags/{tag}.html" }
+        let updatedConfig = {config with blogIndex = $"tags/{slug}.html" }
         let filteredPosts = List.filter (fun p -> Array.exists (fun x -> x = tag) p.frontmatter.tags) posts
         createIndexPerTag filteredPosts tag updatedConfig
 
