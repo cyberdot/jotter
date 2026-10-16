@@ -40,7 +40,7 @@ module Post =
         {{
           "title": "{title}",
           "description": "A new blog post",
-          "created": "{DateTimeOffset.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ")}",
+          "created": "{DateTimeOffset.UtcNow.ToString("o")}",
           "tags": ["post", "new"],
           "slug": "{IOUtils.urlSlug(title)}"
         }}

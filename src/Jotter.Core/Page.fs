@@ -42,7 +42,7 @@ module Page =
         {{ 
 	       "title": "{title}", 
 	       "description": "A new page", 
-	       "created": "{DateTimeOffset.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ")}", 
+	       "created": "{DateTimeOffset.UtcNow.ToString("o")}",
 	       "tags": ["page", "new"], 
 	       "slug": "{IOUtils.urlSlug(title)}"
 	    }}
