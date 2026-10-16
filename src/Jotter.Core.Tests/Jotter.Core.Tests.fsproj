@@ -23,6 +23,7 @@
     <Compile Include="PostTests.fs" />
     <Compile Include="PageTests.fs" />
     <Compile Include="SiteMapTests.fs" />
+    <Compile Include="AssetsTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
