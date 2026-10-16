@@ -21,7 +21,7 @@ module BuildTask =
         posts |> Rss.create
         posts |> Index.create
         
-        SiteMap.create()
+        posts |> SiteMap.create
         ()
         
 
