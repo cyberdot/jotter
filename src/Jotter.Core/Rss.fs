@@ -28,7 +28,12 @@ module Rss =
 
     // Feed readers expect newest-first regardless of how the site's own pagination is
     // configured to sort, and an unbounded feed grows forever as a blog accumulates posts.
-    let private maxItems = 20
+    let maxItems = 20
+
+    let selectFeedPosts (posts: Post list) =
+        posts
+        |> List.sortByDescending (fun p -> p.dateCreated)
+        |> List.truncate maxItems
 
     let buildFeed (posts: Post list) =
         let config = Config.data()
@@ -53,8 +58,7 @@ module Rss =
 
     let create (posts: Post list) =
         posts
-        |> List.sortByDescending (fun p -> p.dateCreated)
-        |> List.truncate maxItems
+        |> selectFeedPosts
         |> buildFeed
         |> writeToFile
         
