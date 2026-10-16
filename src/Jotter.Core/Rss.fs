@@ -25,28 +25,38 @@ module Rss =
         item
         
     let compileRss (posts: Post list) = posts |> Seq.map (fun p -> buildItem p)
-    
-    let buildFeed posts =
+
+    // Feed readers expect newest-first regardless of how the site's own pagination is
+    // configured to sort, and an unbounded feed grows forever as a blog accumulates posts.
+    let private maxItems = 20
+
+    let buildFeed (posts: Post list) =
         let config = Config.data()
-        
+
         let feed = SyndicationFeed()
         feed.Title <- TextSyndicationContent(config.name)
         feed.Id <- config.url
         feed.Description <- TextSyndicationContent(config.description)
         feed.LastUpdatedTime <- DateTimeOffset.UtcNow
-        feed.Language <- "en-gb"
-        
+        feed.Language <- config.language
+        feed.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(config.url, UriKind.RelativeOrAbsolute)))
+
         feed.Items <- compileRss posts
-        
+
         feed
-        
+
     let writeToFile (feed: SyndicationFeed) =
         let rssFormatter = Rss20FeedFormatter(feed)
         let rssWriter = XmlWriter.Create($"{Config.publicDirectory}/{rssFileName}")
         rssFormatter.WriteTo(rssWriter)
         rssWriter.Close();
-        
-    let create posts = posts |> Posts.sortByDate |> buildFeed |> writeToFile
+
+    let create (posts: Post list) =
+        posts
+        |> List.sortByDescending (fun p -> p.dateCreated)
+        |> List.truncate maxItems
+        |> buildFeed
+        |> writeToFile
         
         
         
