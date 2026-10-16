@@ -78,11 +78,12 @@ module Page =
                        
         let filename = Document.fileName filepath
         let path = Document.htmlFilename false filepath
-        
+        let pageUrl = $"{(Config.data()).url}/{filename}"
+
         let vm = pageViewModel content frontMatter filename
         let renderedContent = Renderer.render pageTemplate vm pageRenderer
-        
-        let lvm = layoutViewModel renderedContent frontMatter path filename
+
+        let lvm = layoutViewModel renderedContent frontMatter pageUrl filename
         let renderedDocument = Renderer.render layoutTemplate lvm layoutRenderer
         
         {

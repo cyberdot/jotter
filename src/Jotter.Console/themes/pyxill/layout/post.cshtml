@@ -16,5 +16,5 @@
 </p>
 
 @if (Model.config.enableDisqusComments) {
-	Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl);	 
+	@Raw(Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl))
 }

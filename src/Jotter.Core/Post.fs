@@ -57,20 +57,21 @@ module Post =
         
         let fileName = mdFile |> Document.fileName
         let htmlPath = mdFile |> Document.htmlFilename true
+        let postUrl = $"{(Config.data()).url}/posts/{fileName}"
         let excerpt = htmlContent |> Document.createExcerpt
-        
+
         let (pageLayout, pageRenderer) = Layout.post()
         let (layoutTemplate, layoutRenderer) = Layout.postLayout()
-        
+
         let vm = {
                    config = Config.data();
                    content = htmlContent;
                    frontmatter = frontmatter;
                    filename = fileName;
-                   path = htmlPath
+                   path = postUrl
                  }
         let result = Renderer.render pageLayout vm pageRenderer
-        
+
         let dvm = {
                      config = Config.data();
                      js = Assets.js("..");
@@ -78,7 +79,7 @@ module Post =
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;
-                     path = htmlPath;
+                     path = postUrl;
                   }
         let document = Renderer.render layoutTemplate dvm layoutRenderer
         {
