@@ -30,6 +30,7 @@
     <Compile Include="RssTests.fs" />
     <Compile Include="ConfigTests.fs" />
     <Compile Include="ThemeTemplateTests.fs" />
+    <Compile Include="SiteTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
