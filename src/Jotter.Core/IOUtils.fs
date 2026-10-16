@@ -1,7 +1,10 @@
 namespace Jotter.Core
 
 open System
+open System.Globalization
 open System.IO;
+open System.Text
+open System.Text.RegularExpressions
 
 module IOUtils =
 
@@ -26,7 +29,20 @@ module IOUtils =
         
         copyAll sourceInfo destinationInfo
         
-     let urlSlug (title: string) = title.ToLowerInvariant().Replace(" ", "-")
+     // Only spaces used to be replaced, so `?`, `:`, `/`, `#`, quotes and accented characters
+     // all ended up in file names and URLs - and on Windows `:` or `?` makes File.WriteAllText
+     // throw. Strip diacritics, special-case `#` (otherwise it would just be dropped, turning
+     // "C#" and "F#" into the same slug), then collapse anything else non-alphanumeric to `-`.
+     let urlSlug (title: string) =
+        let withoutSharp = title.Replace("#", "sharp")
+        let decomposed = withoutSharp.Normalize(NormalizationForm.FormD)
+        let withoutDiacritics =
+            decomposed
+            |> Seq.filter (fun c -> CharUnicodeInfo.GetUnicodeCategory(c) <> UnicodeCategory.NonSpacingMark)
+            |> Seq.toArray
+            |> fun chars -> System.String(chars)
+        let lowered = withoutDiacritics.ToLowerInvariant()
+        Regex.Replace(lowered, "[^a-z0-9]+", "-").Trim('-')
 
      let slugFileName (title: string) = $"{urlSlug title}.markdown"
 
