@@ -82,7 +82,7 @@ module Page =
         let vm = pageViewModel content frontMatter filename
         let renderedContent = Renderer.render pageTemplate vm pageRenderer
         
-        let lvm = layoutViewModel content frontMatter path filename
+        let lvm = layoutViewModel renderedContent frontMatter path filename
         let renderedDocument = Renderer.render layoutTemplate lvm layoutRenderer
         
         {
