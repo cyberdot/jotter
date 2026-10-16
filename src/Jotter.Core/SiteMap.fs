@@ -9,7 +9,7 @@ open Jotter.Core.Document
 
 module SiteMap =
 
-    type private Entry = {
+    type Entry = {
         loc: string
         lastModify: string
         changeFreq: string
@@ -18,24 +18,24 @@ module SiteMap =
 
     let private buildDate = DateTime.UtcNow.ToString("yyyy-MM-dd")
 
-    let private homeEntry (config: ConfigurationModel) =
+    let homeEntry (config: ConfigurationModel) =
         { loc = config.url; lastModify = buildDate; changeFreq = "weekly"; priority = "1.0" }
 
     // Posts have a real date to report; everything else falls back to the build date, which
     // is still more honest than claiming every page on the site changed on the same day.
-    let private postEntry (config: ConfigurationModel) (post: Post) =
+    let postEntry (config: ConfigurationModel) (post: Post) =
         { loc = $"{config.url}/posts/{post.filename}"
           lastModify = post.frontmatter.created.UtcDateTime.ToString("yyyy-MM-dd")
           changeFreq = "monthly"
           priority = "0.8" }
 
-    let private pageEntry (config: ConfigurationModel) (fileName: string) =
+    let pageEntry (config: ConfigurationModel) (fileName: string) =
         { loc = $"{config.url}/{fileName}"
           lastModify = buildDate
           changeFreq = "monthly"
           priority = "0.5" }
 
-    let private isIndexFile (fileName: string) =
+    let isIndexFile (fileName: string) =
         fileName = "index.html" || Regex.IsMatch(fileName, @"^index\d+\.html$")
 
     // Tag and pagination pages are aggregations of the same posts that are already listed
