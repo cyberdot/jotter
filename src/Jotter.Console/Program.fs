@@ -12,9 +12,12 @@ let main argv =
     let initCmd = Command("init", "Create the scaffolding for the static site")
     let themeArg = Argument<string>("theme")
     themeArg.Description <- "Blog theme"
+    let forceOption = Option<bool>("--force")
+    forceOption.Description <- "Overwrite an existing site, deleting all posts, drafts and pages"
 
     initCmd.Add(themeArg)
-    initCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.Site.init (pr.GetValue(themeArg))))
+    initCmd.Add(forceOption)
+    initCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.Site.init (pr.GetValue(themeArg)) (pr.GetValue(forceOption))))
     root.Add(initCmd)
 
 

@@ -37,7 +37,10 @@ module Site =
        Post.setup()
        Tags.setup()
 
-   let init (theme: string)=
+   let init (theme: string) (force: bool) =
+       if not force && Directory.Exists(Config.contentDirectory) then
+           failwith $"{Config.contentDirectory} already exists. Re-run with --force to overwrite it and delete all existing posts, drafts and pages, or remove it yourself first."
+
        clean()
        copyRootFiles()
        Config.init theme
