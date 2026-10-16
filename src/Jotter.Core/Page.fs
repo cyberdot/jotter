@@ -51,6 +51,9 @@ module Page =
         Welcome to your brand new page.
         """
         
+    // Model.path in the page templates must be a public URL, not a filesystem path.
+    let pageUrl (config: ConfigurationModel) (filename: string) = $"{config.url}/{filename}"
+
     let private layoutViewModel (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
         {
            config = Config.data();
@@ -79,12 +82,12 @@ module Page =
                        
         let filename = Document.fileName filepath
         let path = Document.htmlFilename false filepath
-        let pageUrl = $"{(Config.data()).url}/{filename}"
+        let url = pageUrl (Config.data()) filename
 
         let vm = pageViewModel content frontMatter filename
         let renderedContent = Renderer.render pageTemplate vm pageRenderer
 
-        let lvm = layoutViewModel renderedContent frontMatter pageUrl filename
+        let lvm = layoutViewModel renderedContent frontMatter url filename
         let renderedDocument = Renderer.render layoutTemplate lvm layoutRenderer
         
         {
