@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Linked in so ThemeTemplateTests can assert against the real shipped template,
+         not a copy that could drift from what Jotter.Console actually bundles. -->
+    <Content Include="..\Jotter.Console\themes\poole\layout\index.cshtml" Link="Fixtures\poole_index.cshtml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +28,8 @@
     <Compile Include="SiteMapTests.fs" />
     <Compile Include="AssetsTests.fs" />
     <Compile Include="RssTests.fs" />
+    <Compile Include="ConfigTests.fs" />
+    <Compile Include="ThemeTemplateTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
