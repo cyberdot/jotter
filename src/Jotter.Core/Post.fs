@@ -49,16 +49,21 @@ module Post =
         Welcome to your brand new Jotter post.
         """
         
+    // Model.path in the post templates must be a public URL, not a filesystem path, or
+    // Disqus (and any theme's canonical link tag) keys off the wrong value.
+    let postUrl (config: ConfigurationModel) (fileName: string) = $"{config.url}/posts/{fileName}"
+
     let private preparePage (mdFile: string) =
         let content = File.ReadAllText(mdFile)
         let (frontmatter, mdContent) = content |> Document.splitIntoParts
-        
+
         let parsedContent = Markdown.Parse mdContent
         let htmlContent = Markdown.ToHtml parsedContent
-        
+
+        let config = Config.data()
         let fileName = mdFile |> Document.fileName
         let htmlPath = mdFile |> Document.htmlFilename true
-        let postUrl = $"{(Config.data()).url}/posts/{fileName}"
+        let url = postUrl config fileName
         let excerpt = htmlContent |> Document.createExcerpt
 
         let (pageLayout, pageRenderer) = Layout.post()
@@ -69,7 +74,7 @@ module Post =
                    content = htmlContent;
                    frontmatter = frontmatter;
                    filename = fileName;
-                   path = postUrl
+                   path = url
                  }
         let result = Renderer.render pageLayout vm pageRenderer
 
@@ -80,7 +85,7 @@ module Post =
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;
-                     path = postUrl;
+                     path = url;
                   }
         let document = Renderer.render layoutTemplate dvm layoutRenderer
         {
