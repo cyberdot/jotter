@@ -15,13 +15,13 @@
 
 <div class="pagination">
     @if (Model.prev > 0) {
-    	<a class="pagination-item older" href="posts/@Model.prevFileName">Older</a>
+    	<a class="pagination-item older" href="/@Model.prevFileName">Older</a>
      } else { 
 	<span class="pagination-item older">Older</span>
      }
      
      @if (Model.next > 0) {
-	<a class="pagination-item newer" href="posts/@Model.nextFileName">Newer</a>
+	<a class="pagination-item newer" href="/@Model.nextFileName">Newer</a>
      } else {
      	<span class="pagination-item newer">Newer</span>
      }
