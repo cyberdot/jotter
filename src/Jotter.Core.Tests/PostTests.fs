@@ -6,6 +6,23 @@ open Xunit
 open Swensen.Unquote
 open Jotter.Core
 
+// File.WriteAllText overwrites silently; without a guard, creating a second post whose
+// title slugs to the same filename (even a plain re-run of the same title) would destroy
+// the first post's content with no warning.
+[<Fact>]
+let ``create refuses to overwrite an existing post with the same slug`` () =
+    TestHelpers.withTempWorkingDirectory (fun () ->
+        Directory.CreateDirectory($"{Config.contentDirectory}/posts") |> ignore
+        let path = $"{Config.contentDirectory}/posts/a-new-post.markdown"
+
+        Post.create "A New Post" false
+        File.WriteAllText(path, "edited by hand")
+
+        Assert.Throws<exn>(fun () -> Post.create "A New Post" false) |> ignore
+
+        test <@ File.ReadAllText(path) = "edited by hand" @>
+    )
+
 [<Fact>]
 let ``postUrl builds an absolute URL under posts, not a filesystem path`` () =
     test <@ Post.postUrl TestHelpers.sampleConfig "hello.html" = "http://localhost:5000/posts/hello.html" @>

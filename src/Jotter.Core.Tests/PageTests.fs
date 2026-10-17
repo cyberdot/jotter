@@ -6,6 +6,22 @@ open Xunit
 open Swensen.Unquote
 open Jotter.Core
 
+// File.WriteAllText overwrites silently; without a guard, creating a second page whose
+// title slugs to the same filename would destroy the first page's content with no warning.
+[<Fact>]
+let ``create refuses to overwrite an existing page with the same slug`` () =
+    TestHelpers.withTempWorkingDirectory (fun () ->
+        Directory.CreateDirectory($"{Config.contentDirectory}/pages") |> ignore
+        let path = $"{Config.contentDirectory}/pages/a-new-page.markdown"
+
+        Page.create "A New Page"
+        File.WriteAllText(path, "edited by hand")
+
+        Assert.Throws<exn>(fun () -> Page.create "A New Page") |> ignore
+
+        test <@ File.ReadAllText(path) = "edited by hand" @>
+    )
+
 [<Fact>]
 let ``pageUrl builds an absolute URL at the site root, not a filesystem path`` () =
     test <@ Page.pageUrl TestHelpers.sampleConfig "about.html" = "http://localhost:5000/about.html" @>
