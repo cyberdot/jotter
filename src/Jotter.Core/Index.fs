@@ -62,16 +62,16 @@ module Index =
         }
         
     let private writeIndexPage (posts: Post list) (config: ConfigurationModel) (pageNum: int) (isLastPage: bool) =
-        let (layout, layoutRenderer) = Layout.indexLayout()
-        let (index, indexRenderer) = Layout.index()
-        
+        let layout = Layout.indexLayout()
+        let index = Layout.index()
+
         let indexModel = createIndexViewModel pageNum config isLastPage posts
-        let indexView = Renderer.render index indexModel indexRenderer
-        
+        let indexView = Renderer.render index indexModel
+
         let layoutModel = createLayoutViewModel indexView config
-        
+
         let path = htmlFileName pageNum config
-        let result = Renderer.render layout layoutModel layoutRenderer
+        let result = Renderer.render layout layoutModel
         File.WriteAllText(path, result)
         
     // An empty blog must still get an index.html - the web server's "/" route has nothing

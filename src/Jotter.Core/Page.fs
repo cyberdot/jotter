@@ -76,19 +76,19 @@ module Page =
          }
          
     let private preparePage (filepath: string) =
-        let (layoutTemplate: string, layoutRenderer: string) = Layout.pageLayout()
-        let (pageTemplate: string, pageRenderer: string) = Layout.page()
+        let layoutTemplate: string = Layout.pageLayout()
+        let pageTemplate: string = Layout.page()
         let (frontMatter: FrontMatter, content: string) = File.ReadAllText(filepath) |> Document.splitIntoParts
-                       
+
         let filename = Document.fileName filepath
         let path = Document.htmlFilename false filepath
         let url = pageUrl (Config.data()) filename
 
         let vm = pageViewModel content frontMatter filename
-        let renderedContent = Renderer.render pageTemplate vm pageRenderer
+        let renderedContent = Renderer.render pageTemplate vm
 
         let lvm = layoutViewModel renderedContent frontMatter url filename
-        let renderedDocument = Renderer.render layoutTemplate lvm layoutRenderer
+        let renderedDocument = Renderer.render layoutTemplate lvm
         
         {
           document = renderedDocument; path = path; filename = filename;

@@ -66,8 +66,8 @@ module Post =
         let url = postUrl config fileName
         let excerpt = htmlContent |> Document.createExcerpt
 
-        let (pageLayout, pageRenderer) = Layout.post()
-        let (layoutTemplate, layoutRenderer) = Layout.postLayout()
+        let pageLayout = Layout.post()
+        let layoutTemplate = Layout.postLayout()
 
         let vm = {
                    config = Config.data();
@@ -76,7 +76,7 @@ module Post =
                    filename = fileName;
                    path = url
                  }
-        let result = Renderer.render pageLayout vm pageRenderer
+        let result = Renderer.render pageLayout vm
 
         let dvm = {
                      config = Config.data();
@@ -87,7 +87,7 @@ module Post =
                      filename = fileName;
                      path = url;
                   }
-        let document = Renderer.render layoutTemplate dvm layoutRenderer
+        let document = Renderer.render layoutTemplate dvm
         {
           dateCreated = frontmatter.created;
           frontmatter = frontmatter;

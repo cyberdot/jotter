@@ -2,7 +2,6 @@ namespace Jotter.Core
 
 open System
 open System.IO
-open Newtonsoft.Json.Linq
 open Jotter.Core.Config
 
 module IndexPager =
@@ -18,12 +17,6 @@ module IndexPager =
             let ext = Path.GetExtension(page)
             (num, $"{rootPath}{num}{ext}")
     
-    let totalPages (postsCount: int) =
-        let config = Config.data()
-        let postsPerPage = config.postsPerPage
-        let result: float = Math.Ceiling(float(postsCount) / float(postsPerPage))
-        Math.Truncate(result)
-        
     let previousPage (pageNum: int) (config: ConfigurationModel) =
         
         if pageNum = 1 then (0, String.Empty)

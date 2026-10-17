@@ -66,14 +66,14 @@ module Tags =
         }
 
     let private writeIndexPage (posts: Post list) (tag:string) (config: ConfigurationModel) (pageNum: int) (isLastPage: bool) =
-        let (layout, layoutRenderer) = Layout.tagLayout()
-        let (index, indexRenderer) = Layout.index()
+        let layout = Layout.tagLayout()
+        let index = Layout.index()
 
         let indexModel = createIndexViewModel pageNum config isLastPage posts
-        let indexView = Renderer.render index indexModel indexRenderer
+        let indexView = Renderer.render index indexModel
 
         let layoutModel = createLayoutViewModel indexView config tag
-        let layoutView = Renderer.render layout layoutModel layoutRenderer
+        let layoutView = Renderer.render layout layoutModel
 
         let filename = htmlFilename pageNum config
         File.WriteAllText(filename, layoutView)
@@ -104,11 +104,11 @@ module Tags =
         createIndexPerTag filteredPosts tag updatedConfig
 
     let private createTagsIndexPage (tags: string array) =
-        let (layout, layoutRenderer) = Layout.layout()
-        let (index, indexRenderer) = Layout.tagIndex()
+        let layout = Layout.layout()
+        let index = Layout.tagIndex()
 
         if (index <> null) then
-            let indexView = Renderer.render index {| content = tags; |} indexRenderer
+            let indexView = Renderer.render index {| content = tags; |}
             let layoutModel = {|
                  config = Config.data();
                  content = indexView;
@@ -117,7 +117,7 @@ module Tags =
             |}
 
             let path = $"{Config.publicDirectory}/tags/index.html"
-            let renderedView = Renderer.render layout layoutModel layoutRenderer
+            let renderedView = Renderer.render layout layoutModel
             File.WriteAllText(path, renderedView)
 
     // Only poole ships a tag_index template (the "list every tag" page), but every theme can

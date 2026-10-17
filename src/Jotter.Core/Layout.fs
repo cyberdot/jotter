@@ -21,29 +21,27 @@ module Layout =
            | None -> ""
 
 
-    let private determineRenderer (content: string, path: string) =
-        let renderer = Path.GetExtension(path)
-        (content, renderer)
-
-
     let private toPath (fileName: string) =
         if System.String.IsNullOrWhiteSpace(fileName) then null
         else $"{basePath()}/{fileName}"
 
-    let rec read (fallback: string) (path: string) =
+    // RazorLight renders every template the same way regardless of its file extension, so
+    // only the content itself is worth returning - the extension used to be threaded all
+    // the way out to Renderer.render, which ignored it too.
+    let rec private read (fallback: string) (path: string) : string =
        if (System.String.IsNullOrWhiteSpace(fallback)) then
-           (File.ReadAllText(path), path)
+           File.ReadAllText(path)
        elif(System.String.IsNullOrWhiteSpace(path)) then
-           fallback |> toFileName |> toPath |> read null 
-       else read null path           
+           fallback |> toFileName |> toPath |> read null
+       else read null path
 
-        
-    let private load (template: string) (fallback: string) =
+
+    let private load (template: string) (fallback: string) : string =
        let fileP = template |> toFileName |> toPath
        if(fileP = null && System.String.IsNullOrWhiteSpace(fallback)) then
-           (null, null)
+           null
        else
-           fileP |> read fallback |> determineRenderer
+           fileP |> read fallback
 
     
     let private resolveLayout (template: string) = load template "layout"  

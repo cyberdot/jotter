@@ -16,7 +16,7 @@ let ``page resolves the theme from the current workspace, not one cached from an
         TestHelpers.setupWorkspace "first"
         File.WriteAllText($"{Config.contentDirectory}/themes/first/layout/page.cshtml", "first theme content")
 
-        let (content, _) = Layout.page ()
+        let content = Layout.page ()
 
         test <@ content = "first theme content" @>
     )
@@ -25,7 +25,7 @@ let ``page resolves the theme from the current workspace, not one cached from an
         TestHelpers.setupWorkspace "second"
         File.WriteAllText($"{Config.contentDirectory}/themes/second/layout/page.cshtml", "second theme content")
 
-        let (content, _) = Layout.page ()
+        let content = Layout.page ()
 
         test <@ content = "second theme content" @>
     )
