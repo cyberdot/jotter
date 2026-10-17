@@ -55,3 +55,24 @@ let ``buildFeed includes a feed-level link, not just per-item links`` () =
 
         test <@ feed.Links.Count > 0 @>
     )
+
+// writeToFile used to Close() the XmlWriter only after WriteTo returned, so a failure while
+// writing (e.g. a title containing a character XML forbids) left the file handle open for
+// the rest of the process. `use` releases it regardless of how WriteTo exits.
+[<Fact>]
+let ``create releases the rss file even when writing the feed fails`` () =
+    TestHelpers.withTempWorkingDirectory (fun () ->
+        Directory.CreateDirectory(Config.contentDirectory) |> ignore
+        Directory.CreateDirectory(Config.publicDirectory) |> ignore
+        Config.init "test"
+
+        let invalidPost =
+            { TestHelpers.samplePost "bad.html" with
+                frontmatter = { TestHelpers.sampleFrontMatter "Bad\u0001Title" with title = "Bad\u0001Title" } }
+
+        Assert.Throws<ArgumentException>(fun () -> Rss.create [ invalidPost ]) |> ignore
+
+        // If the file handle were still open from the failed write, this would throw
+        // IOException instead of succeeding.
+        File.WriteAllText($"{Config.publicDirectory}/{Rss.rssFileName}", "can overwrite")
+    )
