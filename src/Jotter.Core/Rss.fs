@@ -50,11 +50,13 @@ module Rss =
 
         feed
 
+    // `use`, not a bare `Close()` call after `WriteTo`: if WriteTo throws (e.g. a post's
+    // title contains a character XmlWriter rejects), the old code left the file handle open
+    // for the rest of the process.
     let writeToFile (feed: SyndicationFeed) =
         let rssFormatter = Rss20FeedFormatter(feed)
-        let rssWriter = XmlWriter.Create($"{Config.publicDirectory}/{rssFileName}")
+        use rssWriter = XmlWriter.Create($"{Config.publicDirectory}/{rssFileName}")
         rssFormatter.WriteTo(rssWriter)
-        rssWriter.Close();
 
     let create (posts: Post list) =
         posts
