@@ -70,7 +70,7 @@ module Post =
         let layoutTemplate = Layout.postLayout()
 
         let vm = {
-                   config = Config.data();
+                   config = config;
                    content = htmlContent;
                    frontmatter = frontmatter;
                    filename = fileName;
@@ -79,7 +79,7 @@ module Post =
         let result = Renderer.render pageLayout vm
 
         let dvm = {
-                     config = Config.data();
+                     config = config;
                      js = Assets.js("..");
                      css = Assets.css("..");
                      content = result;
@@ -95,7 +95,7 @@ module Post =
           path = htmlPath;
           filename = fileName;
           excerpt = excerpt;
-          config = Config.data();
+          config = config;
         }
         
     let prepare (mdFile: string) (posts: Post list) =

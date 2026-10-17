@@ -54,9 +54,9 @@ module Page =
     // Model.path in the page templates must be a public URL, not a filesystem path.
     let pageUrl (config: ConfigurationModel) (filename: string) = $"{config.url}/{filename}"
 
-    let private layoutViewModel (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
+    let private layoutViewModel (config: ConfigurationModel) (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
         {
-           config = Config.data();
+           config = config;
            js = Assets.js("..");
            css = Assets.css("..");
            content = content;
@@ -64,30 +64,31 @@ module Page =
            path = path;
            filename = filename;
         }
-        
-    let private pageViewModel (content: string) (frontmatter: FrontMatter) (filename: string) =
+
+    let private pageViewModel (config: ConfigurationModel) (content: string) (frontmatter: FrontMatter) (filename: string) =
          let parsedContent = Markdown.Parse content
          let htmlContent = Markdown.ToHtml parsedContent
          {
-           config = Config.data();
+           config = config;
            content = htmlContent;
            frontmatter = frontmatter;
            filename = filename;
          }
-         
+
     let private preparePage (filepath: string) =
         let layoutTemplate: string = Layout.pageLayout()
         let pageTemplate: string = Layout.page()
         let (frontMatter: FrontMatter, content: string) = File.ReadAllText(filepath) |> Document.splitIntoParts
 
+        let config = Config.data()
         let filename = Document.fileName filepath
         let path = Document.htmlFilename false filepath
-        let url = pageUrl (Config.data()) filename
+        let url = pageUrl config filename
 
-        let vm = pageViewModel content frontMatter filename
+        let vm = pageViewModel config content frontMatter filename
         let renderedContent = Renderer.render pageTemplate vm
 
-        let lvm = layoutViewModel renderedContent frontMatter url filename
+        let lvm = layoutViewModel config renderedContent frontMatter url filename
         let renderedDocument = Renderer.render layoutTemplate lvm
         
         {
