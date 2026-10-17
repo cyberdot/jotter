@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Compile Include="TestHelpers.fs" />
+    <Compile Include="LayoutTests.fs" />
     <Compile Include="IOUtilsTests.fs" />
     <Compile Include="IndexPagerTests.fs" />
     <Compile Include="StoreTests.fs" />
