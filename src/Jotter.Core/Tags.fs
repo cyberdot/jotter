@@ -106,32 +106,33 @@ module Tags =
     let private createTagsIndexPage (tags: string array) =
         let (layout, layoutRenderer) = Layout.layout()
         let (index, indexRenderer) = Layout.tagIndex()
-        
+
         if (index <> null) then
             let indexView = Renderer.render index {| content = tags; |} indexRenderer
             let layoutModel = {|
                  config = Config.data();
                  content = indexView;
                  filename = "index.html"
-                 css = Assets.css(".");        
+                 css = Assets.css(".");
             |}
 
             let path = $"{Config.publicDirectory}/tags/index.html"
             let renderedView = Renderer.render layout layoutModel layoutRenderer
             File.WriteAllText(path, renderedView)
-            true
-        else false
 
-    let create (posts: Post list) =       
+    // Only poole ships a tag_index template (the "list every tag" page), but every theme can
+    // still render each tag's own archive via tag_layout, which falls back to the theme's
+    // plain layout when it doesn't have one. Gating this on tag_index existing meant every
+    // other bundled theme got zero tag pages at all.
+    let create (posts: Post list) =
 
-        let tags = posts 
+        let tags = posts
                     |> List.map (fun p -> p.frontmatter.tags)
                     |> Array.concat
                     |> Array.distinct
                     |> Array.sort
-        let isCreated = createTagsIndexPage tags
-        if (isCreated = true) then
-            tags |> Array.iter (fun t -> renderPostsPerTag t posts)
+        createTagsIndexPage tags
+        tags |> Array.iter (fun t -> renderPostsPerTag t posts)
         
     let setup () =
          
