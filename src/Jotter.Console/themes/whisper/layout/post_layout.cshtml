@@ -63,6 +63,9 @@
 
     <meta name="generator" content="Jotter-1.0" />
     <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="@Model.config.url/blog.rss" />
+    @if (!System.String.IsNullOrWhiteSpace(Model.config.googleAnalyticsId)) {
+        @Raw(Jotter.Core.GA.render(Model.config.googleAnalyticsId))
+    }
 </head>
 <body class="post-template nav-closed">
 

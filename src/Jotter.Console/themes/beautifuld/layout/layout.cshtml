@@ -17,6 +17,9 @@
 		<meta property="og:type" content="website"/>
 		<meta property="og:url" content="@Model.config.url"/>
 		<meta property="og:image" content="assets/img/avatar-icon.png"/>
+		@if (!System.String.IsNullOrWhiteSpace(Model.config.googleAnalyticsId)) {
+			@Raw(Jotter.Core.GA.render(Model.config.googleAnalyticsId))
+		}
 	</head>
 	<body>
 		<nav class="navbar navbar-default navbar-fixed-top navbar-custom">

@@ -90,7 +90,9 @@ dotnet run --project src/Jotter.Console -- server
 
 `init` generates `_workspace/config.json`, which controls site-wide settings such as `name`, `author`,
 `url`, `description`, `language`, `posts_per_page`, `sort_posts`, `theme`, `date_format`, social links
-(`github`, `twitter`, `linked_in`, `email`), and Disqus (`disqus_url`, `enable_disqus_comments`).
+(`github`, `twitter`, `linked_in`, `email`), Disqus (`disqus_url`, `enable_disqus_comments`), and Google
+Analytics (`google_analytics_id` - every bundled theme embeds the snippet automatically once this is set
+to a tracking ID; leave it blank, the default, to leave Analytics out of the site entirely).
 
 ## Testing
 

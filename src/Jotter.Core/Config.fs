@@ -30,7 +30,9 @@ module Config =
       [<JsonProperty("disqus_url")>]
       disqusUrl: string;
       [<JsonProperty("enable_disqus_comments")>]
-      enableDisqusComments: bool;    
+      enableDisqusComments: bool;
+      [<JsonProperty("google_analytics_id")>]
+      googleAnalyticsId: string;
       blogIndex: string;
     }
 
@@ -59,8 +61,9 @@ module Config =
 	  "twitter": "twitter_account_name", 
 	  "linked_in": "linked_in_account_name", 
 	  "email": "user_email@email-provider.com", 
-	  "disqus_url": "disqus_username.disqus.com", 
-      "enable_disqus_comments": true 
+	  "disqus_url": "disqus_username.disqus.com",
+      "enable_disqus_comments": true,
+      "google_analytics_id": ""
     }}
     
     """
