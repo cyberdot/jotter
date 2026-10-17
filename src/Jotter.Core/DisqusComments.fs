@@ -1,16 +1,12 @@
 namespace Jotter.Core
 
+open Jotter.Core.IOUtils
+
 module DisqusComments =
 
-    // documentUrl/disqusUrl land inside single-quoted JS string literals below. Both are
-    // normally built from config.url (free-form user input), so a single quote or backslash
-    // in there would otherwise terminate the literal early and corrupt the embedded script.
-    let private escapeForJsString (value: string) =
-        value.Replace("\\", "\\\\").Replace("'", "\\'")
-
     let render (documentUrl: string) (disqusUrl: string) =
-       let documentUrl = escapeForJsString documentUrl
-       let disqusUrl = escapeForJsString disqusUrl
+       let documentUrl = IOUtils.escapeForJsString documentUrl
+       let disqusUrl = IOUtils.escapeForJsString disqusUrl
        $"""
         <div id="disqus_thread"></div>
 			<script>

@@ -57,6 +57,13 @@ module IOUtils =
          if File.Exists(path) then
              failwith $"{path} already exists. Choose a different title, or edit the existing file directly."
          File.WriteAllText(path, content)
+
+     // Shared by DisqusComments and GA: both interpolate a config value (document/disqus
+     // url, GA tracking id) straight into a single-quoted JS string literal. A single quote
+     // or backslash in that value would otherwise close the literal early and corrupt the
+     // embedded script.
+     let escapeForJsString (value: string) =
+         value.Replace("\\", "\\\\").Replace("'", "\\'")
      
    
             
