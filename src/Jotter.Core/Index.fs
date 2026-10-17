@@ -74,24 +74,8 @@ module Index =
         let result = Renderer.render layout layoutModel
         File.WriteAllText(path, result)
         
-    // An empty blog must still get an index.html - the web server's "/" route has nothing
-    // to serve otherwise - but once we're past page 1, running out of posts means we're done.
-    let rec private compileIndex (config: ConfigurationModel) (pageNum: int) (posts: Post list) =
-        if posts.Length = 0 && pageNum > 1 then ()
-        else
-            let postsPerPage = List.truncate config.postsPerPage posts
-
-            let mutable remainder = List.empty
-            if (config.postsPerPage <= (List.length posts)) then
-                remainder <- List.skip config.postsPerPage posts
-
-            let lastPage = IndexPager.lastPage remainder
-            writeIndexPage postsPerPage config pageNum lastPage
-            if posts.Length > 0 then
-                compileIndex config (pageNum + 1) remainder
-
-            
     let create (posts: Post list) =
         let config = Config.data()
-        posts |> Posts.sortByDate |> compileIndex config 1 |> ignore
+        let writePage pageNum isLastPage pagePosts = writeIndexPage pagePosts config pageNum isLastPage
+        posts |> Posts.sortByDate |> IndexPager.paginate writePage config.postsPerPage 1
 

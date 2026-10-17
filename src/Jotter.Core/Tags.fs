@@ -78,20 +78,9 @@ module Tags =
         let filename = htmlFilename pageNum config
         File.WriteAllText(filename, layoutView)
 
-    let rec private compileIndex (tag: string) (config: ConfigurationModel) (pageNum: int) (posts: Post list) =
-        if posts.Length = 0 then ()
-        else 
-           let postsPerPage = List.truncate config.postsPerPage posts
-           
-           let mutable remainder = List.empty
-           if(config.postsPerPage <= (List.length posts)) then
-               remainder <- List.skip config.postsPerPage posts
-           let isLastPage = IndexPager.lastPage remainder
-           writeIndexPage postsPerPage tag config pageNum isLastPage
-           compileIndex tag config (pageNum + 1) remainder
-
     let private createIndexPerTag (posts: Post list) (tag: string) (config: ConfigurationModel) =
-        posts |> Posts.sortByDate |> compileIndex tag config 1
+        let writePage pageNum isLastPage pagePosts = writeIndexPage pagePosts tag config pageNum isLastPage
+        posts |> Posts.sortByDate |> IndexPager.paginate writePage config.postsPerPage 1
 
     // Tags.create writes each tag's index to this path (via IOUtils.urlSlug), so any link
     // pointing at a tag page must be built from the same function or the link 404s.
