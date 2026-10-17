@@ -84,6 +84,13 @@ module Document =
 
     let splitIntoParts (content: string) =
         let endIndex = findFrontMatterEnd content
+        if endIndex = -1 then
+            // Without this, an unterminated front matter block silently became "no front
+            // matter, the whole file is body": frontMatter deserializes to null, and every
+            // caller crashes on frontMatter.title/description/etc. with a NullReferenceException
+            // that points nowhere near the actual typo.
+            let preview = if content.Length > 80 then content.Substring(0, 80) + "..." else content
+            failwith $"Malformed front matter: no closing '}}' found for the JSON block. Starts with: {preview}"
         let frontMatterJson = content.Substring(0, endIndex + 1)
         let body = content.Substring(endIndex + 1)
         let frontMatter = JsonConvert.DeserializeObject<FrontMatter>(frontMatterJson)
