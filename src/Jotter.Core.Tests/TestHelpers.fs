@@ -24,6 +24,7 @@ let sampleConfig: ConfigurationModel =
       email = "test@example.com"
       disqusUrl = "test.disqus.com"
       enableDisqusComments = false
+      googleAnalyticsId = ""
       blogIndex = "index.html" }
 
 let sampleFrontMatter (title: string) : FrontMatter =
