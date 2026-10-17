@@ -39,6 +39,15 @@ let ``splitIntoParts handles a closing brace inside a front matter value`` () =
     test <@ frontMatter.title = "My } Post" @>
     test <@ body = "\nBody." @>
 
+// Without the guard, an unterminated front matter block silently became "no front matter,
+// whole file is body" - frontMatter deserialized to null and the crash happened far later,
+// deep in rendering, pointing nowhere near the actual typo.
+[<Fact>]
+let ``splitIntoParts fails clearly on an unterminated front matter block`` () =
+    let content = "{\"title\":\"T\",\"description\":\"D\"\nBody content here."
+
+    Assert.Throws<exn>(fun () -> Document.splitIntoParts content |> ignore) |> ignore
+
 [<Fact>]
 let ``createExcerpt appends an ellipsis to short content unchanged`` () =
     test <@ Document.createExcerpt "short text" = "short text ..." @>
