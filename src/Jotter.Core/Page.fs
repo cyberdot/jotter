@@ -108,7 +108,7 @@ module Page =
     let create (title: string) =
         let path = title |> IOUtils.filenameFromTitle pagesDir
         let content = defaultPage title
-        File.WriteAllText(path, content) |> ignore
+        IOUtils.writeNewFile path content
         
     let list () = Directory.GetFiles(pagesDir)        
         

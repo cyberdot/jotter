@@ -48,6 +48,15 @@ module IOUtils =
 
      let filenameFromTitle (directory: string) (title: string) =
          $"{directory}/{slugFileName title}"
+
+     // File.WriteAllText overwrites silently, so two titles that slug to the same filename
+     // (the same title typed twice, or "My Post" vs "my post!") would destroy the earlier
+     // file's content with no warning - the same class of problem as the guard already on
+     // `init` for overwriting a whole site, just one level down.
+     let writeNewFile (path: string) (content: string) =
+         if File.Exists(path) then
+             failwith $"{path} already exists. Choose a different title, or edit the existing file directly."
+         File.WriteAllText(path, content)
      
    
             

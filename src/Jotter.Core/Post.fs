@@ -114,7 +114,7 @@ module Post =
                      | false -> $"{Config.contentDirectory}/posts"
       let path = IOUtils.filenameFromTitle dir title
       let content = defaultPost title
-      File.WriteAllText(path, content) |> ignore        
+      IOUtils.writeNewFile path content
         
     let list () =
         let dir = $"{Config.contentDirectory}/posts"
