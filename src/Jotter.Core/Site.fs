@@ -41,6 +41,12 @@ module Site =
        if not force && Directory.Exists(Config.contentDirectory) then
            failwith $"{Config.contentDirectory} already exists. Re-run with --force to overwrite it and delete all existing posts, drafts and pages, or remove it yourself first."
 
+       // Without this, a typo'd theme name succeeded silently here and only failed later,
+       // confusingly, when `build` tried to read a theme directory that was never copied.
+       let availableThemes = Theme.available()
+       if not (Array.contains theme availableThemes) then
+           failwith $"""Unknown theme '{theme}'. Available themes: {String.Join(", ", availableThemes)}."""
+
        clean()
        copyRootFiles()
        Config.init theme
