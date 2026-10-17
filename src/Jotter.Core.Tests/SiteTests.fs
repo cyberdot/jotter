@@ -17,3 +17,13 @@ let ``init refuses to overwrite an existing site without --force`` () =
         // The guard must trip before clean() runs, or the existing site is gone either way.
         test <@ File.Exists(sentinelPath) @>
     )
+
+// Without this, a typo'd theme name succeeded silently at init and only failed later,
+// confusingly, when build tried to read a theme directory that was never copied.
+[<Fact>]
+let ``init rejects an unknown theme before touching the filesystem`` () =
+    TestHelpers.withTempWorkingDirectory (fun () ->
+        Assert.Throws<exn>(fun () -> Site.init "no-such-theme" true) |> ignore
+
+        test <@ not (Directory.Exists(Config.contentDirectory)) @>
+    )

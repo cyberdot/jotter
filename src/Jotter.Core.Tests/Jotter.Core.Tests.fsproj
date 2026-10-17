@@ -25,11 +25,20 @@
     <Content Include="..\Jotter.Console\themes\whisper\layout\layout.cshtml" Link="Fixtures\layouts\whisper_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Jotter.Console\themes\whisper\layout\post_layout.cshtml" Link="Fixtures\layouts\whisper_post_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\Jotter.Console\themes\whisper\layout\tag_layout.cshtml" Link="Fixtures\layouts\whisper_tag_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Mirrors Jotter.Console's own "themes\**\*" content glob, so IOUtils.resolveAppPath
+         "themes" (Theme.available, Theme.init, Site.init's theme validation) resolves to the
+         real bundled themes here too, instead of a directory that doesn't exist at all under
+         this project's own output. -->
+    <Content Include="..\Jotter.Console\themes\**\*.*">
+      <Link>themes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="TestHelpers.fs" />
     <Compile Include="LayoutTests.fs" />
+    <Compile Include="ThemeTests.fs" />
     <Compile Include="IOUtilsTests.fs" />
     <Compile Include="IndexPagerTests.fs" />
     <Compile Include="StoreTests.fs" />
