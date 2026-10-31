@@ -2,6 +2,7 @@ namespace Jotter.Core
 
 open System
 open System.IO
+open Newtonsoft.Json
 open FSharp.Formatting.Markdown
 open Jotter.Core.Config
 open Jotter.Core.IOUtils
@@ -38,9 +39,9 @@ module Post =
     let private defaultPost (title: string) =
         $"""
         {{
-          "title": "{title}",
+          "title": {JsonConvert.ToString(title)},
           "description": "A new blog post",
-          "created": "{DateTimeOffset.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ")}",
+          "created": "{DateTimeOffset.UtcNow.ToString("o")}",
           "tags": ["post", "new"],
           "slug": "{IOUtils.urlSlug(title)}"
         }}
@@ -48,39 +49,45 @@ module Post =
         Welcome to your brand new Jotter post.
         """
         
+    // Model.path in the post templates must be a public URL, not a filesystem path, or
+    // Disqus (and any theme's canonical link tag) keys off the wrong value.
+    let postUrl (config: ConfigurationModel) (fileName: string) = $"{config.url}/posts/{fileName}"
+
     let private preparePage (mdFile: string) =
         let content = File.ReadAllText(mdFile)
         let (frontmatter, mdContent) = content |> Document.splitIntoParts
-        
+
         let parsedContent = Markdown.Parse mdContent
         let htmlContent = Markdown.ToHtml parsedContent
-        
+
+        let config = Config.data()
         let fileName = mdFile |> Document.fileName
         let htmlPath = mdFile |> Document.htmlFilename true
+        let url = postUrl config fileName
         let excerpt = htmlContent |> Document.createExcerpt
-        
-        let (pageLayout, pageRenderer) = Layout.post()
-        let (layoutTemplate, layoutRenderer) = Layout.postLayout()
-        
+
+        let pageLayout = Layout.post()
+        let layoutTemplate = Layout.postLayout()
+
         let vm = {
-                   config = Config.data();
+                   config = config;
                    content = htmlContent;
                    frontmatter = frontmatter;
                    filename = fileName;
-                   path = htmlPath
+                   path = url
                  }
-        let result = Renderer.render pageLayout vm pageRenderer
-        
+        let result = Renderer.render pageLayout vm
+
         let dvm = {
-                     config = Config.data();
+                     config = config;
                      js = Assets.js("..");
                      css = Assets.css("..");
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;
-                     path = htmlPath;
+                     path = url;
                   }
-        let document = Renderer.render layoutTemplate dvm layoutRenderer
+        let document = Renderer.render layoutTemplate dvm
         {
           dateCreated = frontmatter.created;
           frontmatter = frontmatter;
@@ -88,12 +95,17 @@ module Post =
           path = htmlPath;
           filename = fileName;
           excerpt = excerpt;
-          config = Config.data();
+          config = config;
         }
         
     let prepare (mdFile: string) (posts: Post list) =
         let post = preparePage mdFile
         Store.addPosts posts [post]
+
+    // Building the full list in one pass keeps this O(n) - threading each file through
+    // `prepare` in a loop would call Store.addPosts (an O(n) list append) once per file.
+    let prepareAll (files: string seq) : Post list =
+        files |> Seq.map preparePage |> Seq.toList
         
        
     let create (title: string) (isDraft: bool) =
@@ -102,7 +114,7 @@ module Post =
                      | false -> $"{Config.contentDirectory}/posts"
       let path = IOUtils.filenameFromTitle dir title
       let content = defaultPost title
-      File.WriteAllText(path, content) |> ignore        
+      IOUtils.writeNewFile path content
         
     let list () =
         let dir = $"{Config.contentDirectory}/posts"

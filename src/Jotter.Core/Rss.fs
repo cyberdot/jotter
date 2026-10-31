@@ -6,6 +6,7 @@ open Newtonsoft.Json.Linq
 open Jotter.Core.Config
 open System.ServiceModel.Syndication
 open Jotter.Core.Document
+open Jotter.Core.Posts
 
 module Rss =
     
@@ -18,32 +19,50 @@ module Rss =
         let item = SyndicationItem()
         item.Title <- TextSyndicationContent(post.frontmatter.title)
         item.Summary <- TextSyndicationContent(post.frontmatter.description)
+        item.PublishDate <- post.frontmatter.created
+        item.LastUpdatedTime <- post.frontmatter.created
         item.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(url, UriKind.RelativeOrAbsolute)))
         item
         
     let compileRss (posts: Post list) = posts |> Seq.map (fun p -> buildItem p)
-    
-    let buildFeed posts =
+
+    // Feed readers expect newest-first regardless of how the site's own pagination is
+    // configured to sort, and an unbounded feed grows forever as a blog accumulates posts.
+    let maxItems = 20
+
+    let selectFeedPosts (posts: Post list) =
+        posts
+        |> List.sortByDescending (fun p -> p.dateCreated)
+        |> List.truncate maxItems
+
+    let buildFeed (posts: Post list) =
         let config = Config.data()
-        
+
         let feed = SyndicationFeed()
         feed.Title <- TextSyndicationContent(config.name)
         feed.Id <- config.url
         feed.Description <- TextSyndicationContent(config.description)
         feed.LastUpdatedTime <- DateTimeOffset.UtcNow
-        feed.Language <- "en-gb"
-        
+        feed.Language <- config.language
+        feed.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(config.url, UriKind.RelativeOrAbsolute)))
+
         feed.Items <- compileRss posts
-        
+
         feed
-        
+
+    // `use`, not a bare `Close()` call after `WriteTo`: if WriteTo throws (e.g. a post's
+    // title contains a character XmlWriter rejects), the old code left the file handle open
+    // for the rest of the process.
     let writeToFile (feed: SyndicationFeed) =
         let rssFormatter = Rss20FeedFormatter(feed)
-        let rssWriter = XmlWriter.Create($"{Config.publicDirectory}/{rssFileName}")
+        use rssWriter = XmlWriter.Create($"{Config.publicDirectory}/{rssFileName}")
         rssFormatter.WriteTo(rssWriter)
-        rssWriter.Close();
-        
-    let create posts = posts |> buildFeed |> writeToFile
+
+    let create (posts: Post list) =
+        posts
+        |> selectFeedPosts
+        |> buildFeed
+        |> writeToFile
         
         
         

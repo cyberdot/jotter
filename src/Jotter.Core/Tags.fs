@@ -66,69 +66,62 @@ module Tags =
         }
 
     let private writeIndexPage (posts: Post list) (tag:string) (config: ConfigurationModel) (pageNum: int) (isLastPage: bool) =
-        let (layout, layoutRenderer) = Layout.tagLayout()
-        let (index, indexRenderer) = Layout.index()
+        let layout = Layout.tagLayout()
+        let index = Layout.index()
 
         let indexModel = createIndexViewModel pageNum config isLastPage posts
-        let indexView = Renderer.render index indexModel indexRenderer
+        let indexView = Renderer.render index indexModel
 
         let layoutModel = createLayoutViewModel indexView config tag
-        let layoutView = Renderer.render layout layoutModel layoutRenderer
+        let layoutView = Renderer.render layout layoutModel
 
         let filename = htmlFilename pageNum config
         File.WriteAllText(filename, layoutView)
 
-    let rec private compileIndex (tag: string) (config: ConfigurationModel) (pageNum: int) (posts: Post list) =
-        if posts.Length = 0 then ()
-        else 
-           let postsPerPage = List.truncate config.postsPerPage posts
-           
-           let mutable remainder = List.empty
-           if(config.postsPerPage <= (List.length posts)) then
-               remainder <- List.skip config.postsPerPage posts
-           let isLastPage = IndexPager.lastPage remainder
-           writeIndexPage postsPerPage tag config pageNum isLastPage
-           compileIndex tag config (pageNum + 1) remainder
-
     let private createIndexPerTag (posts: Post list) (tag: string) (config: ConfigurationModel) =
-        posts |> Posts.sortByDate |> compileIndex tag config 1
+        let writePage pageNum isLastPage pagePosts = writeIndexPage pagePosts tag config pageNum isLastPage
+        posts |> Posts.sortByDate |> IndexPager.paginate writePage config.postsPerPage 1
+
+    // Tags.create writes each tag's index to this path (via IOUtils.urlSlug), so any link
+    // pointing at a tag page must be built from the same function or the link 404s.
+    let tagIndexFileName (tag: string) = $"tags/{IOUtils.urlSlug tag}.html"
 
     let private renderPostsPerTag (tag: string) (posts: Post list) =
-        let slug = IOUtils.urlSlug tag
         let config = Config.data()
-        let updatedConfig = {config with blogIndex = $"tags/{tag}.html" }
+        let updatedConfig = {config with blogIndex = tagIndexFileName tag }
         let filteredPosts = List.filter (fun p -> Array.exists (fun x -> x = tag) p.frontmatter.tags) posts
         createIndexPerTag filteredPosts tag updatedConfig
 
     let private createTagsIndexPage (tags: string array) =
-        let (layout, layoutRenderer) = Layout.layout()
-        let (index, indexRenderer) = Layout.tagIndex()
-        
+        let layout = Layout.layout()
+        let index = Layout.tagIndex()
+
         if (index <> null) then
-            let indexView = Renderer.render index {| content = tags; |} indexRenderer
+            let indexView = Renderer.render index {| content = tags; |}
             let layoutModel = {|
                  config = Config.data();
                  content = indexView;
                  filename = "index.html"
-                 css = Assets.css(".");        
+                 css = Assets.css(".");
             |}
 
             let path = $"{Config.publicDirectory}/tags/index.html"
-            let renderedView = Renderer.render layout layoutModel layoutRenderer
+            let renderedView = Renderer.render layout layoutModel
             File.WriteAllText(path, renderedView)
-            true
-        else false
 
-    let create (posts: Post list) =       
+    // Only poole ships a tag_index template (the "list every tag" page), but every theme can
+    // still render each tag's own archive via tag_layout, which falls back to the theme's
+    // plain layout when it doesn't have one. Gating this on tag_index existing meant every
+    // other bundled theme got zero tag pages at all.
+    let create (posts: Post list) =
 
-        let tags = posts 
+        let tags = posts
                     |> List.map (fun p -> p.frontmatter.tags)
                     |> Array.concat
                     |> Array.distinct
                     |> Array.sort
-        let isCreated = createTagsIndexPage tags
-        if (isCreated = true) then
-            tags |> Array.iter (fun t -> renderPostsPerTag t posts)
+        createTagsIndexPage tags
+        tags |> Array.iter (fun t -> renderPostsPerTag t posts)
         
     let setup () =
          

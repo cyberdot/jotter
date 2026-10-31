@@ -12,6 +12,9 @@
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/img/apple-touch-icon-144-precomposed.png">
 	<link rel="shortcut icon" href="assets/img/favicon.png">
 	<link href="/blog.rss" rel="alternate" type="application/rss+xml" title="@Model.config.name"/>
+	@if (!System.String.IsNullOrWhiteSpace(Model.config.googleAnalyticsId)) {
+		@Raw(Jotter.Core.GA.render(Model.config.googleAnalyticsId))
+	}
 	</head>
 	<body class="theme-base-08 ">
 		<div class="sidebar">

@@ -11,6 +11,9 @@
     <![endif]-->
 
     <title>@Model.config.name</title>
+    @if (!System.String.IsNullOrWhiteSpace(Model.config.googleAnalyticsId)) {
+        @Raw(Jotter.Core.GA.render(Model.config.googleAnalyticsId))
+    }
   </head>
 
   <body>

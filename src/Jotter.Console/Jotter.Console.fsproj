@@ -25,6 +25,7 @@
 	     wasn't set. A single glob avoids that drift. -->
 	<ItemGroup>
 		<Content Include="themes\**\*" />
+		<Content Include="site_files\**\*" />
 	</ItemGroup>
 
 	<ItemGroup>

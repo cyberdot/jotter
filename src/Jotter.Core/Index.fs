@@ -62,33 +62,20 @@ module Index =
         }
         
     let private writeIndexPage (posts: Post list) (config: ConfigurationModel) (pageNum: int) (isLastPage: bool) =
-        let (layout, layoutRenderer) = Layout.indexLayout()
-        let (index, indexRenderer) = Layout.index()
-        
+        let layout = Layout.indexLayout()
+        let index = Layout.index()
+
         let indexModel = createIndexViewModel pageNum config isLastPage posts
-        let indexView = Renderer.render index indexModel indexRenderer
-        
+        let indexView = Renderer.render index indexModel
+
         let layoutModel = createLayoutViewModel indexView config
-        
+
         let path = htmlFileName pageNum config
-        let result = Renderer.render layout layoutModel layoutRenderer
+        let result = Renderer.render layout layoutModel
         File.WriteAllText(path, result)
         
-    let rec private compileIndex  (config: ConfigurationModel) (pageNum: int) (posts: Post list)=
-        if posts.Length = 0 then null
-        else
-            let postsPerPage = List.truncate config.postsPerPage posts
-            
-            let mutable remainder = List.empty
-            if (config.postsPerPage <= (List.length posts)) then
-                remainder <- List.skip config.postsPerPage posts
-            
-            let lastPage = IndexPager.lastPage remainder
-            writeIndexPage postsPerPage config pageNum lastPage
-            compileIndex config (pageNum + 1) remainder
-
-            
     let create (posts: Post list) =
         let config = Config.data()
-        posts |> Posts.sortByDate |> compileIndex config 1 |> ignore
+        let writePage pageNum isLastPage pagePosts = writeIndexPage pagePosts config pageNum isLastPage
+        posts |> Posts.sortByDate |> IndexPager.paginate writePage config.postsPerPage 1
 

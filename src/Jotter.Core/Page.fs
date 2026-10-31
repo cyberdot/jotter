@@ -2,6 +2,7 @@ namespace Jotter.Core
 
 open System
 open System.IO
+open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 open FSharp.Formatting.Markdown
 open Jotter.Core.Config
@@ -39,10 +40,10 @@ module Page =
     
     let defaultPage (title: string) =
         $"""
-        {{ 
-	       "title": "{title}", 
-	       "description": "A new page", 
-	       "created": "{DateTimeOffset.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ")}", 
+        {{
+	       "title": {JsonConvert.ToString(title)},
+	       "description": "A new page",
+	       "created": "{DateTimeOffset.UtcNow.ToString("o")}",
 	       "tags": ["page", "new"], 
 	       "slug": "{IOUtils.urlSlug(title)}"
 	    }}
@@ -50,9 +51,12 @@ module Page =
         Welcome to your brand new page.
         """
         
-    let private layoutViewModel (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
+    // Model.path in the page templates must be a public URL, not a filesystem path.
+    let pageUrl (config: ConfigurationModel) (filename: string) = $"{config.url}/{filename}"
+
+    let private layoutViewModel (config: ConfigurationModel) (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
         {
-           config = Config.data();
+           config = config;
            js = Assets.js("..");
            css = Assets.css("..");
            content = content;
@@ -60,30 +64,32 @@ module Page =
            path = path;
            filename = filename;
         }
-        
-    let private pageViewModel (content: string) (frontmatter: FrontMatter) (filename: string) =
+
+    let private pageViewModel (config: ConfigurationModel) (content: string) (frontmatter: FrontMatter) (filename: string) =
          let parsedContent = Markdown.Parse content
          let htmlContent = Markdown.ToHtml parsedContent
          {
-           config = Config.data();
+           config = config;
            content = htmlContent;
            frontmatter = frontmatter;
            filename = filename;
          }
-         
+
     let private preparePage (filepath: string) =
-        let (layoutTemplate: string, layoutRenderer: string) = Layout.pageLayout()
-        let (pageTemplate: string, pageRenderer: string) = Layout.page()
+        let layoutTemplate: string = Layout.pageLayout()
+        let pageTemplate: string = Layout.page()
         let (frontMatter: FrontMatter, content: string) = File.ReadAllText(filepath) |> Document.splitIntoParts
-                       
+
+        let config = Config.data()
         let filename = Document.fileName filepath
         let path = Document.htmlFilename false filepath
-        
-        let vm = pageViewModel content frontMatter filename
-        let renderedContent = Renderer.render pageTemplate vm pageRenderer
-        
-        let lvm = layoutViewModel content frontMatter path filename
-        let renderedDocument = Renderer.render layoutTemplate lvm layoutRenderer
+        let url = pageUrl config filename
+
+        let vm = pageViewModel config content frontMatter filename
+        let renderedContent = Renderer.render pageTemplate vm
+
+        let lvm = layoutViewModel config renderedContent frontMatter url filename
+        let renderedDocument = Renderer.render layoutTemplate lvm
         
         {
           document = renderedDocument; path = path; filename = filename;
@@ -94,11 +100,16 @@ module Page =
     let prepare (mdFile: string) (pages: Page list) =
         let page = preparePage mdFile
         Store.addPages pages [page]
+
+    // Building the full list in one pass keeps this O(n) - threading each file through
+    // `prepare` in a loop would call Store.addPages (an O(n) list append) once per file.
+    let prepareAll (files: string seq) : Page list =
+        files |> Seq.map preparePage |> Seq.toList
     
     let create (title: string) =
         let path = title |> IOUtils.filenameFromTitle pagesDir
         let content = defaultPage title
-        File.WriteAllText(path, content) |> ignore
+        IOUtils.writeNewFile path content
         
     let list () = Directory.GetFiles(pagesDir)        
         

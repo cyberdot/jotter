@@ -12,9 +12,12 @@ let main argv =
     let initCmd = Command("init", "Create the scaffolding for the static site")
     let themeArg = Argument<string>("theme")
     themeArg.Description <- "Blog theme"
+    let forceOption = Option<bool>("--force")
+    forceOption.Description <- "Overwrite an existing site, deleting all posts, drafts and pages"
 
     initCmd.Add(themeArg)
-    initCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.Site.init (pr.GetValue(themeArg))))
+    initCmd.Add(forceOption)
+    initCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.Site.init (pr.GetValue(themeArg)) (pr.GetValue(forceOption))))
     root.Add(initCmd)
 
 
@@ -44,6 +47,14 @@ let main argv =
     draftCmd.Add(draftTitleArg)
     draftCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.DraftTask.run (pr.GetValue(draftTitleArg))))
     root.Add(draftCmd)
+
+    let publishCmd = Command("publish", "Move a draft into published posts")
+    let publishTitleArg = Argument<string>("title")
+    publishTitleArg.Description <- "Draft title"
+
+    publishCmd.Add(publishTitleArg)
+    publishCmd.SetAction(Action<ParseResult>(fun pr -> Jotter.Core.PublishTask.run (pr.GetValue(publishTitleArg))))
+    root.Add(publishCmd)
 
     let serverCmd = Command("server", "Start a local server to view the blog")
     serverCmd.SetAction(Action<ParseResult>(fun _ -> Jotter.Core.ServerTask.run()))

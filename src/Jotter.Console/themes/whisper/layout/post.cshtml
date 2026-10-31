@@ -10,7 +10,7 @@
 			@if (Model.frontmatter.tags.Length > 0) {
 			<text>on</text>
 				@foreach(var tag in Model.frontmatter.tags) {
-					<a href="/tags/@(tag).html">@tag</a> 
+					<a href="/tags/@(Jotter.Core.IOUtils.urlSlug(tag)).html">@tag</a>
 				}			
 			}	
         </section>
@@ -52,7 +52,7 @@
 
     </footer>
 	@if (Model.config.enableDisqusComments) {
-		Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl);	 
+		@Raw(Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl))
 	}
 </article>
 </main>

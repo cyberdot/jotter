@@ -15,6 +15,19 @@ let ``urlSlug leaves already-slugified text unchanged`` () =
     test <@ IOUtils.urlSlug "already-a-slug" = "already-a-slug" @>
 
 [<Fact>]
+let ``urlSlug strips unsafe filesystem and URL characters`` () =
+    test <@ IOUtils.urlSlug "What? Really: Yes/No" = "what-really-yes-no" @>
+
+[<Fact>]
+let ``urlSlug maps # to sharp instead of dropping it`` () =
+    test <@ IOUtils.urlSlug "C#" = "csharp" @>
+    test <@ IOUtils.urlSlug "F#" = "fsharp" @>
+
+[<Fact>]
+let ``urlSlug strips accented characters down to ASCII`` () =
+    test <@ IOUtils.urlSlug "Café résumé" = "cafe-resume" @>
+
+[<Fact>]
 let ``filenameFromTitle builds a markdown path from directory and title`` () =
     test <@ IOUtils.filenameFromTitle "posts" "My First Post" = "posts/my-first-post.markdown" @>
 

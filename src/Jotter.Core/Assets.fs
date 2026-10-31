@@ -13,19 +13,27 @@ module Assets =
         let destination = $"{Config.publicDirectory}/assets"
         IOUtils.copyDirectory source destination
         
-    let private cssFiles (dir: string) =
-        let dirInfo = new DirectoryInfo(dir)
-        let files = dirInfo.GetFiles(".", SearchOption.AllDirectories)
-        files |> Seq.sortBy (fun f -> f.Name)
-              |> Seq.map (fun f -> $"assets/css/{f.Name}")
-              |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
-              
-    let private jsFiles (dir: string) =
+    // Recursing without filtering by extension pulled in every file under the directory
+    // (images, text files, a theme's highlight.js stylesheets under assets/js/styles/...),
+    // and flattening to f.Name discarded the subpath, so files with the same name in
+    // different subdirectories collided and nested files resolved to a path that doesn't
+    // exist (assets/js/agate.css instead of assets/js/styles/agate.css).
+    let private assetFiles (dir: string) (assetType: string) (extension: string) =
         let dirInfo = DirectoryInfo(dir)
-        let files = dirInfo.GetFiles(".", SearchOption.AllDirectories)
-        files |> Seq.sortBy (fun f -> f.Name)
-              |> Seq.map (fun f -> $"assets/js/{f.Name}")
+        let baseLength = dirInfo.FullName.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Length + 1
+        let files = dirInfo.GetFiles($"*.{extension}", SearchOption.AllDirectories)
+        files |> Seq.sortBy (fun f -> f.FullName)
+              |> Seq.map (fun f ->
+                    let relativePath =
+                        f.FullName.Substring(baseLength)
+                                  .Replace(Path.DirectorySeparatorChar, '/')
+                                  .Replace(Path.AltDirectorySeparatorChar, '/')
+                    $"assets/{assetType}/{relativePath}")
               |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
+
+    let private cssFiles (dir: string) = assetFiles dir "css" "css"
+
+    let private jsFiles (dir: string) = assetFiles dir "js" "js"
          
     let css (startPath: string) =
         let cssDir = $"{Config.publicDirectory}/assets/css"

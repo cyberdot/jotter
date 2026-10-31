@@ -4,42 +4,44 @@ open System.IO
 open Jotter.Core.Theme
 open Jotter.Core.Config
 
-module Layout = 
-        
-    let private basePath = $"{Config.contentDirectory}/themes/{Theme.current()}/layout"
+module Layout =
+
+    // A plain `let basePath = ...` here would be a module-level value: computed once, on
+    // the first call into this module, and then cached as a field for the rest of the
+    // process - every later call would keep reading whatever theme/config.json was current
+    // at that first touch, however stale. Making it a function re-reads it every time.
+    let private basePath () = $"{Config.contentDirectory}/themes/{Theme.current()}/layout"
 
     let private toFileName (template: string) =
-        let dirInfo = new DirectoryInfo(basePath)
+        let dirInfo = new DirectoryInfo(basePath())
         let files = dirInfo.GetFiles() |> Array.map (fun fileInfo -> fileInfo.Name)
         let result = files |> Array.tryFind (fun f -> Path.ChangeExtension(f, null) = template)
         match result with
            | Some fileName -> fileName
            | None -> ""
-        
-   
-    let private determineRenderer (content: string, path: string) =
-        let renderer = Path.GetExtension(path)
-        (content, renderer)
-     
-     
+
+
     let private toPath (fileName: string) =
         if System.String.IsNullOrWhiteSpace(fileName) then null
-        else $"{basePath}/{fileName}"    
-   
-    let rec read (fallback: string) (path: string) =
-       if (System.String.IsNullOrWhiteSpace(fallback)) then
-           (File.ReadAllText(path), path)
-       elif(System.String.IsNullOrWhiteSpace(path)) then
-           fallback |> toFileName |> toPath |> read null 
-       else read null path           
+        else $"{basePath()}/{fileName}"
 
-        
-    let private load (template: string) (fallback: string) =
+    // RazorLight renders every template the same way regardless of its file extension, so
+    // only the content itself is worth returning - the extension used to be threaded all
+    // the way out to Renderer.render, which ignored it too.
+    let rec private read (fallback: string) (path: string) : string =
+       if (System.String.IsNullOrWhiteSpace(fallback)) then
+           File.ReadAllText(path)
+       elif(System.String.IsNullOrWhiteSpace(path)) then
+           fallback |> toFileName |> toPath |> read null
+       else read null path
+
+
+    let private load (template: string) (fallback: string) : string =
        let fileP = template |> toFileName |> toPath
        if(fileP = null && System.String.IsNullOrWhiteSpace(fallback)) then
-           (null, null)
+           null
        else
-           fileP |> read fallback |> determineRenderer
+           fileP |> read fallback
 
     
     let private resolveLayout (template: string) = load template "layout"  
@@ -58,7 +60,3 @@ module Layout =
     let post () = load "post" ""
     
     let layout ()= load "layout" ""
-    
-    let path = $"{Config.contentDirectory}/themes/{Theme.current()}/layout/layout.cshtml"
-    
-    

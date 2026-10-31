@@ -29,6 +29,7 @@
 		<Compile Include="Site.fs" />
 		<Compile Include="Tasks\BuildTask.fs" />
 		<Compile Include="Tasks\DraftTask.fs" />
+		<Compile Include="Tasks\PublishTask.fs" />
 		<Compile Include="Tasks\PageTask.fs" />
 		<Compile Include="Tasks\PostTask.fs" />
 		<Compile Include="Tasks\ServerTask.fs" />

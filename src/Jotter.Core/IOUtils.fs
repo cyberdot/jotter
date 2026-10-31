@@ -1,9 +1,17 @@
 namespace Jotter.Core
 
+open System
+open System.Globalization
 open System.IO;
+open System.Text
+open System.Text.RegularExpressions
 
 module IOUtils =
-    
+
+     // Bundled assets (themes, site_files) ship next to the executable, not in the current
+     // working directory - that's where the generated site lives instead.
+     let resolveAppPath (relativePath: string) = Path.Combine(AppContext.BaseDirectory, relativePath)
+
      let rec private copyAll (source: DirectoryInfo) (destination: DirectoryInfo) =
         
         let sourceFiles = source.GetFiles()
@@ -21,11 +29,41 @@ module IOUtils =
         
         copyAll sourceInfo destinationInfo
         
+     // Only spaces used to be replaced, so `?`, `:`, `/`, `#`, quotes and accented characters
+     // all ended up in file names and URLs - and on Windows `:` or `?` makes File.WriteAllText
+     // throw. Strip diacritics, special-case `#` (otherwise it would just be dropped, turning
+     // "C#" and "F#" into the same slug), then collapse anything else non-alphanumeric to `-`.
+     let urlSlug (title: string) =
+        let withoutSharp = title.Replace("#", "sharp")
+        let decomposed = withoutSharp.Normalize(NormalizationForm.FormD)
+        let withoutDiacritics =
+            decomposed
+            |> Seq.filter (fun c -> CharUnicodeInfo.GetUnicodeCategory(c) <> UnicodeCategory.NonSpacingMark)
+            |> Seq.toArray
+            |> fun chars -> System.String(chars)
+        let lowered = withoutDiacritics.ToLowerInvariant()
+        Regex.Replace(lowered, "[^a-z0-9]+", "-").Trim('-')
+
+     let slugFileName (title: string) = $"{urlSlug title}.markdown"
+
      let filenameFromTitle (directory: string) (title: string) =
-         let titlePart = title.ToLowerInvariant().Replace(" ", "-")
-         $"{directory}/{titlePart}.markdown"
-         
-     let urlSlug (title: string) = title.ToLowerInvariant().Replace(" ", "-")
+         $"{directory}/{slugFileName title}"
+
+     // File.WriteAllText overwrites silently, so two titles that slug to the same filename
+     // (the same title typed twice, or "My Post" vs "my post!") would destroy the earlier
+     // file's content with no warning - the same class of problem as the guard already on
+     // `init` for overwriting a whole site, just one level down.
+     let writeNewFile (path: string) (content: string) =
+         if File.Exists(path) then
+             failwith $"{path} already exists. Choose a different title, or edit the existing file directly."
+         File.WriteAllText(path, content)
+
+     // Shared by DisqusComments and GA: both interpolate a config value (document/disqus
+     // url, GA tracking id) straight into a single-quoted JS string literal. A single quote
+     // or backslash in that value would otherwise close the literal early and corrupt the
+     // embedded script.
+     let escapeForJsString (value: string) =
+         value.Replace("\\", "\\\\").Replace("'", "\\'")
      
    
             

@@ -1,8 +1,11 @@
 namespace Jotter.Core
 
+open Jotter.Core.IOUtils
+
 module GA =
-    
+
     let render (accountId: string) =
+        let accountId = IOUtils.escapeForJsString accountId
         $"""
             <!-- Google Analytics -->
 			<script>
@@ -11,6 +14,6 @@ module GA =
 			ga('send', 'pageview');
 			</script>
 			<script async src='https://www.google-analytics.com/analytics.js'></script>
-			<!-- End Google Analytics -->	
+			<!-- End Google Analytics -->
         """
 

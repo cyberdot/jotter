@@ -45,3 +45,20 @@ let ``nextPage returns nothing when on the last page`` () =
 [<Fact>]
 let ``nextPage points to the next index file when more pages remain`` () =
     test <@ IndexPager.nextPage 1 false TestHelpers.sampleConfig = (2, "index2.html") @>
+
+// Both Index.fs and Tags.fs page through their items with this same function, so its
+// edge cases - an empty list, and marking only the final page as last - only need covering
+// once here instead of once per caller.
+[<Fact>]
+let ``paginate writes exactly one empty page for an empty list`` () =
+    let pages = ResizeArray()
+    IndexPager.paginate (fun pageNum isLast items -> pages.Add(pageNum, isLast, items)) 2 1 (List.empty<int>)
+
+    test <@ List.ofSeq pages = [ (1, true, []) ] @>
+
+[<Fact>]
+let ``paginate splits items across pages and marks only the last one as last`` () =
+    let pages = ResizeArray()
+    IndexPager.paginate (fun pageNum isLast items -> pages.Add(pageNum, isLast, items)) 2 1 [ 1; 2; 3; 4; 5 ]
+
+    test <@ List.ofSeq pages = [ (1, false, [ 1; 2 ]); (2, false, [ 3; 4 ]); (3, true, [ 5 ]) ] @>

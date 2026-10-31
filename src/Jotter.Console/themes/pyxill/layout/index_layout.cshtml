@@ -11,6 +11,9 @@
 	<meta name="keywords" content="">
 	<link rel="canonical" href="@Model.config.url">
 	@Raw(Model.css)
+	@if (!System.String.IsNullOrWhiteSpace(Model.config.googleAnalyticsId)) {
+		@Raw(Jotter.Core.GA.render(Model.config.googleAnalyticsId))
+	}
 </head>
 <body>
 	<div class="site-wrap">

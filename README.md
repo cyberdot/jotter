@@ -72,6 +72,7 @@ Available commands:
 | `page <title>`        | Create a new page under `_workspace/pages`                |
 | `post <title>`        | Create a new published post under `_workspace/posts`      |
 | `draft <title>`       | Create a new draft under `_workspace/drafts`               |
+| `publish <title>`     | Move a draft into `_workspace/posts`                        |
 | `build`               | Render everything in `_workspace` into `_public`           |
 | `server`              | Serve the `_public` folder locally for previewing          |
 
@@ -79,7 +80,8 @@ Typical workflow:
 
 ```
 dotnet run --project src/Jotter.Console -- init whisper
-dotnet run --project src/Jotter.Console -- post "My first post"
+dotnet run --project src/Jotter.Console -- draft "My first post"
+dotnet run --project src/Jotter.Console -- publish "My first post"
 dotnet run --project src/Jotter.Console -- build
 dotnet run --project src/Jotter.Console -- server
 ```
@@ -88,7 +90,9 @@ dotnet run --project src/Jotter.Console -- server
 
 `init` generates `_workspace/config.json`, which controls site-wide settings such as `name`, `author`,
 `url`, `description`, `language`, `posts_per_page`, `sort_posts`, `theme`, `date_format`, social links
-(`github`, `twitter`, `linked_in`, `email`), and Disqus (`disqus_url`, `enable_disqus_comments`).
+(`github`, `twitter`, `linked_in`, `email`), Disqus (`disqus_url`, `enable_disqus_comments`), and Google
+Analytics (`google_analytics_id` - every bundled theme embeds the snippet automatically once this is set
+to a tracking ID; leave it blank, the default, to leave Analytics out of the site entirely).
 
 ## Testing
 
@@ -104,10 +108,11 @@ Two GitHub Actions workflows live under `.github/workflows`:
   push and on every pull request opened or updated. A merged PR is covered too, since merging pushes
   a commit to the base branch.
 - **Release** (`release.yml`) — manually triggered (`workflow_dispatch`). Builds and tests `master`,
-  publishes a self-contained, versioned `Jotter.Console.exe` (win-x64), tags `master` with that
-  version, and creates a GitHub release with the executable attached and auto-generated release
-  notes. Pass a `version` input (e.g. `1.4.0`) to set it explicitly, or leave it empty to auto-increment
-  the patch version from the latest `vX.Y.Z` tag.
+  publishes self-contained, versioned Jotter.Console executables for Windows, Linux, and macOS
+  (win-x64, linux-x64, osx-x64), tags `master` with that version, and creates a GitHub release with
+  all three executables attached and auto-generated release notes. Pass a `version` input (e.g.
+  `1.4.0`) to set it explicitly, or leave it empty to auto-increment the patch version from the
+  latest `vX.Y.Z` tag.
 
 ## License
 

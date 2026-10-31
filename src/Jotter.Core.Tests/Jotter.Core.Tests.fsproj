@@ -8,10 +8,37 @@
 
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Linked in so ThemeTemplateTests can assert against the real shipped template,
+         not a copy that could drift from what Jotter.Console actually bundles. -->
+    <Content Include="..\Jotter.Console\themes\poole\layout\index.cshtml" Link="Fixtures\poole_index.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Every theme's full-page layout template (the files resolveLayout can select,
+         directly or via its "layout" fallback), linked so GoogleAnalyticsTests can assert
+         the GA snippet is wired into all of them, not just whichever one was edited by hand. -->
+    <Content Include="..\Jotter.Console\themes\architect\layout\layout.cshtml" Link="Fixtures\layouts\architect_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\beautifuld\layout\layout.cshtml" Link="Fixtures\layouts\beautifuld_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\hyde\layout\layout.cshtml" Link="Fixtures\layouts\hyde_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\poole\layout\layout.cshtml" Link="Fixtures\layouts\poole_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\poole\layout\tag_layout.cshtml" Link="Fixtures\layouts\poole_tag_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\pyxill\layout\layout.cshtml" Link="Fixtures\layouts\pyxill_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\pyxill\layout\index_layout.cshtml" Link="Fixtures\layouts\pyxill_index_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\uno\layout\layout.cshtml" Link="Fixtures\layouts\uno_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\whisper\layout\layout.cshtml" Link="Fixtures\layouts\whisper_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\whisper\layout\post_layout.cshtml" Link="Fixtures\layouts\whisper_post_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Jotter.Console\themes\whisper\layout\tag_layout.cshtml" Link="Fixtures\layouts\whisper_tag_layout.cshtml" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Mirrors Jotter.Console's own "themes\**\*" content glob, so IOUtils.resolveAppPath
+         "themes" (Theme.available, Theme.init, Site.init's theme validation) resolves to the
+         real bundled themes here too, instead of a directory that doesn't exist at all under
+         this project's own output. -->
+    <Content Include="..\Jotter.Console\themes\**\*.*">
+      <Link>themes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="TestHelpers.fs" />
+    <Compile Include="LayoutTests.fs" />
+    <Compile Include="ThemeTests.fs" />
     <Compile Include="IOUtilsTests.fs" />
     <Compile Include="IndexPagerTests.fs" />
     <Compile Include="StoreTests.fs" />
@@ -19,6 +46,15 @@
     <Compile Include="GATests.fs" />
     <Compile Include="DisqusCommentsTests.fs" />
     <Compile Include="IndexTests.fs" />
+    <Compile Include="TagsTests.fs" />
+    <Compile Include="PostTests.fs" />
+    <Compile Include="PageTests.fs" />
+    <Compile Include="SiteMapTests.fs" />
+    <Compile Include="AssetsTests.fs" />
+    <Compile Include="RssTests.fs" />
+    <Compile Include="ConfigTests.fs" />
+    <Compile Include="ThemeTemplateTests.fs" />
+    <Compile Include="SiteTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
