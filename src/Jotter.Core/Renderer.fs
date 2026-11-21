@@ -30,7 +30,7 @@ module Renderer =
         |> SHA256.HashData
         |> Convert.ToHexString
 
-    let render (content: string) (vm: obj) =
+    let render<'T> (content: string) (vm: 'T) =
         let key = templateKey content
         engine.CompileRenderStringAsync(key, content, vm) |> Async.AwaitTask |> Async.RunSynchronously
 

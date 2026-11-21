@@ -13,30 +13,20 @@
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="shortcut icon" href="/favicon.ico">
 	
 	@Raw(Model.css)
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
 
-    <link rel="canonical" href="@Model.config.url" />
+    <link rel="canonical" href="@Model.path" />
     <meta name="referrer" content="origin" />
-    <link rel="next" href="@Model.config.url/page/2/" />
     
     <meta property="og:site_name" content="@Model.config.name" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="@Model.config.name" />
     <meta property="og:description" content="@Model.config.description" />
-    <meta property="og:url" content="@Model.config.url" />
+    <meta property="og:url" content="@Model.path" />
        
-    <script type="application/ld+json">
-	<text>{</text>
-		"@@context": "http://schema.org",
-		"@@type": "Website",
-		"publisher": "@Model.config.name",
-		"url": "@Model.config.url",
-		"description": "@Model.config.description"
-	<text>}</text>
-    </script>
+    @Raw(Jotter.Core.StructuredData.website(Model.config, Model.path))
 
     <meta name="generator" content="Jotter-1.0" />
     <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="@Model.config.url/blog.rss" />

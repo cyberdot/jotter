@@ -5,6 +5,7 @@ open System.Globalization
 open System.IO;
 open System.Text
 open System.Text.RegularExpressions
+open Newtonsoft.Json
 
 module IOUtils =
 
@@ -44,7 +45,30 @@ module IOUtils =
         let lowered = withoutDiacritics.ToLowerInvariant()
         Regex.Replace(lowered, "[^a-z0-9]+", "-").Trim('-')
 
-     let slugFileName (title: string) = $"{urlSlug title}.markdown"
+     let discoverMarkdownFiles (directory: string) =
+         if not (Directory.Exists(directory)) then
+             [||]
+         else
+             let files =
+                 Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
+                 |> Array.sort
+             let unsupported =
+                 files
+                 |> Array.filter (fun path ->
+                     let extension = Path.GetExtension(path).ToLowerInvariant()
+                     extension <> ".markdown" && extension <> ".md")
+             if unsupported.Length > 0 then
+                 let names = String.Join(", ", unsupported)
+                 raise
+                     (BuildException
+                         $"Unsupported files in content directory '{directory}': {names}. Expected .markdown or .md files.")
+             files
+
+     let slugFileName (title: string) =
+         let slug = urlSlug title
+         if String.IsNullOrWhiteSpace(slug) then
+             raise (BuildException $"The title '{title}' does not contain any characters that can form a file name.")
+         $"{slug}.markdown"
 
      let filenameFromTitle (directory: string) (title: string) =
          $"{directory}/{slugFileName title}"
@@ -55,15 +79,19 @@ module IOUtils =
      // `init` for overwriting a whole site, just one level down.
      let writeNewFile (path: string) (content: string) =
          if File.Exists(path) then
-             failwith $"{path} already exists. Choose a different title, or edit the existing file directly."
+             raise (BuildException $"{path} already exists. Choose a different title, or edit the existing file directly.")
          File.WriteAllText(path, content)
 
-     // Shared by DisqusComments and GA: both interpolate a config value (document/disqus
-     // url, GA tracking id) straight into a single-quoted JS string literal. A single quote
-     // or backslash in that value would otherwise close the literal early and corrupt the
-     // embedded script.
-     let escapeForJsString (value: string) =
-         value.Replace("\\", "\\\\").Replace("'", "\\'")
+     let protectInlineJson (value: string) =
+         value
+             .Replace("<", "\\u003C")
+             .Replace(">", "\\u003E")
+             .Replace("&", "\\u0026")
+             .Replace("\u2028", "\\u2028")
+             .Replace("\u2029", "\\u2029")
+
+     let serializeForInlineScript (value: string) =
+         JsonConvert.SerializeObject(value) |> protectInlineJson
      
    
             

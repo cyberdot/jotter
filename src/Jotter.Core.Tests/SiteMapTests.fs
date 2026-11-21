@@ -1,12 +1,16 @@
 module Jotter.Core.Tests.SiteMapTests
 
+open System
 open Xunit
 open Swensen.Unquote
 open Jotter.Core
 
 [<Fact>]
 let ``homeEntry gets the top priority`` () =
-    test <@ SiteMap.homeEntry(TestHelpers.sampleConfig).priority = "1.0" @>
+    TestHelpers.withTempSite (fun paths ->
+        let context = { paths = paths; config = TestHelpers.sampleConfig; builtAt = DateTimeOffset.UtcNow }
+        test <@ (SiteMap.homeEntry context).priority = "1.0" @>
+    )
 
 [<Fact>]
 let ``postEntry uses the post's own created date, not the build date`` () =
@@ -20,8 +24,11 @@ let ``postEntry uses the post's own created date, not the build date`` () =
 
 [<Fact>]
 let ``pageEntry gets a lower priority than the home page and than posts`` () =
-    let entry = SiteMap.pageEntry TestHelpers.sampleConfig "about.html"
-    test <@ entry.priority = "0.5" @>
+    TestHelpers.withTempSite (fun paths ->
+        let context = { paths = paths; config = TestHelpers.sampleConfig; builtAt = DateTimeOffset.UtcNow }
+        let entry = SiteMap.pageEntry context "about.html"
+        test <@ entry.priority = "0.5" @>
+    )
 
 [<Fact>]
 let ``isIndexFile recognises the home page and numbered pagination pages`` () =

@@ -1,8 +1,13 @@
 name: Build and Test
 
-# Manual trigger only.
 on:
+  push:
+  pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

@@ -19,5 +19,11 @@ let ``render embeds the Google Analytics account id`` () =
 let ``render escapes a single quote in the account id instead of breaking out of the JS string`` () =
     let html = GA.render "UA-12345-1'; alert('x"
 
-    test <@ html.Contains("ga('create', 'UA-12345-1\\'; alert(\\'x', 'auto');") @>
-    test <@ not (html.Contains("ga('create', 'UA-12345-1'; alert('x', 'auto');")) @>
+    test <@ html.Contains("""ga('create', "UA-12345-1'; alert('x", 'auto');""") @>
+
+[<Fact>]
+let ``render protects script endings in inline values`` () =
+    let html = GA.render "</script><script>alert(1)</script>"
+
+    test <@ html.Contains("\\u003C/script\\u003E") @>
+    test <@ not (html.Contains("\"</script>")) @>

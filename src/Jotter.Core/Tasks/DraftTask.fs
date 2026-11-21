@@ -2,10 +2,10 @@ namespace Jotter.Core
 
 module DraftTask =
     
-    let run (title: string) =
+    let run (paths: SitePaths) (title: string) =
         if System.String.IsNullOrWhiteSpace(title) then
-            failwith "Cannot create new draft without post name"
+            raise (BuildException "Cannot create new draft without post name")
         else
-            Draft.create title
+            Draft.create paths title
         
 

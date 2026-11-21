@@ -8,9 +8,9 @@ open Jotter.Core.IOUtils
 
 module Assets =
     
-    let copy () =
-        let source = $"{Config.contentDirectory}/themes/{Theme.current()}/assets"
-        let destination = $"{Config.publicDirectory}/assets"
+    let copy (context: BuildContext) =
+        let source = SitePaths.inWorkspace context.paths $"themes/{context.config.theme}/assets"
+        let destination = SitePaths.inPublic context.paths "assets"
         IOUtils.copyDirectory source destination
         
     // Recursing without filtering by extension pulled in every file under the directory
@@ -29,27 +29,26 @@ module Assets =
                                   .Replace(Path.DirectorySeparatorChar, '/')
                                   .Replace(Path.AltDirectorySeparatorChar, '/')
                     $"assets/{assetType}/{relativePath}")
-              |> Seq.filter (fun f -> Directory.Exists($"{Config.publicDirectory}/{f}") = false)
 
     let private cssFiles (dir: string) = assetFiles dir "css" "css"
 
     let private jsFiles (dir: string) = assetFiles dir "js" "js"
          
-    let css (startPath: string) =
-        let cssDir = $"{Config.publicDirectory}/assets/css"
+    let css (publicDirectory: string) (_outputPath: string) =
+        let cssDir = Path.Combine(publicDirectory, "assets", "css")
         let exists = Directory.Exists(cssDir)
         match exists with
-            | true -> let links = cssFiles(cssDir) 
-                                    |> Seq.map (fun f -> $"<link rel=\"stylesheet\" href=\"{startPath}/{f}\" />")
+            | true -> let links = cssFiles(cssDir)
+                                    |> Seq.map (fun f -> $"<link rel=\"stylesheet\" href=\"/{f}\" />")
                       String.Join("\n", links)                      
             | false -> String.Empty
      
-    let js (startPath: string) =
-        let jsDir = $"{Config.publicDirectory}/assets/js"
+    let js (publicDirectory: string) (_outputPath: string) =
+        let jsDir = Path.Combine(publicDirectory, "assets", "js")
         let exists = Directory.Exists(jsDir)
         match exists with
             | true -> let links = jsFiles(jsDir)
-                                  |> Seq.map (fun f -> $"<script type=\"text/javascript\" src=\"{startPath}/{f}\"></script>")
+                                  |> Seq.map (fun f -> $"<script type=\"text/javascript\" src=\"/{f}\"></script>")
                       String.Join("\n", links)
             | false -> String.Empty
             

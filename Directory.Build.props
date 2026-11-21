@@ -8,7 +8,9 @@
 		  are backward compatible, so this is safe to ignore; no newer FSharp.Formatting release is
 		  available to fix the pin upstream.
 		-->
-		<NoWarn>$(NoWarn);NU1608</NoWarn>
+		<NoWarn Condition="'$(MSBuildProjectName)' == 'Jotter.Core'
+		                   or '$(MSBuildProjectName)' == 'Jotter.Console'
+		                   or '$(MSBuildProjectName)' == 'Jotter.Core.Tests'">$(NoWarn);NU1608</NoWarn>
 	</PropertyGroup>
 
 </Project>

@@ -12,19 +12,18 @@
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="shortcut icon" href="/favicon.ico">
 	
 	@Raw(Model.css)
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
 
-    <link rel="canonical" href="@Model.config.url" />
+    <link rel="canonical" href="@Model.path" />
     <meta name="referrer" content="origin" />
        
     <meta property="og:site_name" content="@Model.config.name" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="@Model.config.name" />
     <meta property="og:description" content="@Model.config.description" />
-    <meta property="og:url" content="@Model.config.url" />
+    <meta property="og:url" content="@Model.path" />
 	
 	<meta property="article:published_time" content="@Model.frontmatter.created" />
     <meta property="article:modified_time" content="@Model.frontmatter.created" />
@@ -37,29 +36,10 @@
 	<meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="@Model.frontmatter.title" />
     <meta name="twitter:description" content="@Model.frontmatter.description" />
-    <meta name="twitter:url" content="@Model.config.url/@(Model.frontmatter.slug).html" />
+    <meta name="twitter:url" content="@Model.path" />
     
        
-    <script type="application/ld+json">
-	<text>{</text>
-		"@@context": "http://schema.org",
-		"@@type": "Article",
-		"author": <text>{</text>
-			"@@type": "Person",
-			"name": "@Model.config.author",
-			"description": "@Model.config.authorDescription"
-		<text>}</text>,
-		"headline": "@Model.frontmatter.title",
-		"publisher": "@Model.config.name",
-		"url": "@Model.config.url",
-		"datePublished": "@Model.frontmatter.created",
-		"dateModified": "@Model.frontmatter.created",
-	        @if (Model.frontmatter.tags.Length > 0) {
-		    <text>"keywords": "</text> @System.String.Join(",", Model.frontmatter.tags); <text>",</text>	
-		 }	
-		"description": "@Model.config.description"
-	<text>}</text>
-    </script>
+    @Raw(Jotter.Core.StructuredData.article(Model.config, Model.frontmatter, Model.path))
 
     <meta name="generator" content="Jotter-1.0" />
     <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="@Model.config.url/blog.rss" />

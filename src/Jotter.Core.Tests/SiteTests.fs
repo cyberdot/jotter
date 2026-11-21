@@ -7,12 +7,12 @@ open Jotter.Core
 
 [<Fact>]
 let ``init refuses to overwrite an existing site without --force`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory(Config.contentDirectory) |> ignore
-        let sentinelPath = $"{Config.contentDirectory}/sentinel.txt"
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(paths.workspace) |> ignore
+        let sentinelPath = SitePaths.inWorkspace paths "sentinel.txt"
         File.WriteAllText(sentinelPath, "existing site content")
 
-        Assert.Throws<exn>(fun () -> Site.init "poole" false) |> ignore
+        Assert.Throws<BuildException>(fun () -> Site.init paths "poole" false) |> ignore
 
         // The guard must trip before clean() runs, or the existing site is gone either way.
         test <@ File.Exists(sentinelPath) @>
@@ -22,8 +22,8 @@ let ``init refuses to overwrite an existing site without --force`` () =
 // confusingly, when build tried to read a theme directory that was never copied.
 [<Fact>]
 let ``init rejects an unknown theme before touching the filesystem`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Assert.Throws<exn>(fun () -> Site.init "no-such-theme" true) |> ignore
+    TestHelpers.withTempSite (fun paths ->
+        Assert.Throws<BuildException>(fun () -> Site.init paths "no-such-theme" true) |> ignore
 
-        test <@ not (Directory.Exists(Config.contentDirectory)) @>
+        test <@ not (Directory.Exists(paths.workspace)) @>
     )

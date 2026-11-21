@@ -15,7 +15,7 @@ let sampleConfig: ConfigurationModel =
       description = "Test site description"
       language = "en-gb"
       postsPerPage = 2
-      sortPosts = "descending"
+      sortPosts = Config.PostSort.Descending
       theme = "whisper"
       dateFormat = "dd MMM yyyy"
       github = "test"
@@ -48,27 +48,20 @@ let samplePage (filename: string) : Page =
       path = $"_public/{filename}"
       filename = filename }
 
-// Config.contentDirectory/publicDirectory are hardcoded relative paths ("./_workspace",
-// "./_public"), so any test touching them must run with the process's current directory
-// pointed at an isolated temp folder. Collection parallelization is disabled in
-// xunit.runner.json so this process-wide mutation is safe between tests.
-let withTempWorkingDirectory (action: unit -> 'a) : 'a =
-    let originalDirectory = Directory.GetCurrentDirectory()
+let withTempSite (action: SitePaths -> 'a) : 'a =
     let tempDirectory = Path.Combine(Path.GetTempPath(), $"jotter-test-{Guid.NewGuid()}")
     Directory.CreateDirectory(tempDirectory) |> ignore
-    Directory.SetCurrentDirectory(tempDirectory)
     try
-        action()
+        action (SitePaths.fromRoot tempDirectory)
     finally
-        Directory.SetCurrentDirectory(originalDirectory)
         Directory.Delete(tempDirectory, true)
 
 let private minimalLayoutCshtml = """<html><body>@Raw(Model.content)</body></html>"""
 let private minimalPassthroughCshtml = """@Raw(Model.content)"""
 let private minimalIndexCshtml = """@foreach(var post in Model.content) { <div class="post">@post.filename</div> }"""
 
-let setupMinimalTheme (theme: string) =
-    let dir = $"{Config.contentDirectory}/themes/{theme}/layout"
+let setupMinimalTheme (paths: SitePaths) (theme: string) =
+    let dir = SitePaths.inWorkspace paths $"themes/{theme}/layout"
     Directory.CreateDirectory(dir) |> ignore
     File.WriteAllText($"{dir}/layout.cshtml", minimalLayoutCshtml)
     File.WriteAllText($"{dir}/page.cshtml", minimalPassthroughCshtml)
@@ -77,8 +70,11 @@ let setupMinimalTheme (theme: string) =
 
 // The minimum _workspace/_public structure needed to exercise the build pipeline (config.json
 // plus a bare-bones theme) without depending on the real themes shipped in Jotter.Console.
-let setupWorkspace (theme: string) =
-    Directory.CreateDirectory(Config.contentDirectory) |> ignore
-    Directory.CreateDirectory(Config.publicDirectory) |> ignore
-    Config.init theme
-    setupMinimalTheme theme
+let setupWorkspace (paths: SitePaths) (theme: string) =
+    Directory.CreateDirectory(paths.workspace) |> ignore
+    Directory.CreateDirectory(paths.publicDirectory) |> ignore
+    Config.init paths theme
+    setupMinimalTheme paths theme
+
+let buildContext (paths: SitePaths) =
+    BuildContext.create paths

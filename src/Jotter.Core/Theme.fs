@@ -7,14 +7,14 @@ open Jotter.Core.IOUtils
 module Theme =
 
     let getTheme (config: ConfigurationModel) = config.theme
-    let current () = Config.data() |> getTheme
+    let current (config: ConfigurationModel) = getTheme config
 
-    let available () =
-        let dir = DirectoryInfo(IOUtils.resolveAppPath "themes")
+    let available (paths: SitePaths) =
+        let dir = DirectoryInfo(paths.bundledThemes)
         dir.GetDirectories() |> Array.map (fun d -> d.Name) |> Array.sort
 
-    let init () =
-        let dir = $"{Config.contentDirectory}/themes"
+    let init (paths: SitePaths) =
+        let dir = SitePaths.inWorkspace paths "themes"
         Directory.CreateDirectory(dir) |> ignore
-        copyDirectory (IOUtils.resolveAppPath "themes") dir
+        copyDirectory paths.bundledThemes dir
 

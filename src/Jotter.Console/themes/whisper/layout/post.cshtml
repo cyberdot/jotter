@@ -21,11 +21,11 @@
 	</section>
 	<footer class="post-footer">	
 		<figure class="author-image">
-			<a class="img" href="about.html" style="background-image: url(/assets/img/logo.png)"><span class="hidden">Author's Picture</span></a>
+			<a class="img" href="/about.html" style="background-image: url(/assets/img/logo.png)"><span class="hidden">Author's Picture</span></a>
 		</figure>
 
 		<section class="author">
-			<h4><a href="about.html">@Model.config.author</a></h4>
+			<h4><a href="/about.html">@Model.config.author</a></h4>
 
 			<p>@Model.config.authorDescription</p>
 			<div class="author-meta">
@@ -36,15 +36,15 @@
 
         <section class="share">
 			<h4>Share this post</h4>
-			<a class="icon-twitter" href="https://twitter.com/intent/tweet?text=@Model.frontmatter.title&amp;url=@Model.config.url/@Model.frontmatter.slug" 
+			<a class="icon-twitter" href="https://twitter.com/intent/tweet?text=@Model.frontmatter.title&amp;url=@Model.path"
 			onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
 				<span class="hidden">Twitter</span>
 			</a>
-			<a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=@Model.config.url/@Model.frontmatter.slug" 
+			<a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=@Model.path"
 			onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
 				<span class="hidden">Facebook</span>
 			</a>
-			<a class="icon-google-plus" href="https://plus.google.com/share?url=@Model.config.url/@Model.frontmatter.slug" 
+			<a class="icon-google-plus" href="https://plus.google.com/share?url=@Model.path"
 			onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
 				<span class="hidden">Google+</span>
 			</a>

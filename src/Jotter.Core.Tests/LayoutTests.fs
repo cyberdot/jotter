@@ -12,20 +12,20 @@ open Jotter.Core
 // throw DirectoryNotFoundException instead of reading the second theme's template.
 [<Fact>]
 let ``page resolves the theme from the current workspace, not one cached from an earlier call`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        TestHelpers.setupWorkspace "first"
-        File.WriteAllText($"{Config.contentDirectory}/themes/first/layout/page.cshtml", "first theme content")
+    TestHelpers.withTempSite (fun paths ->
+        TestHelpers.setupWorkspace paths "first"
+        File.WriteAllText(SitePaths.inWorkspace paths "themes/first/layout/page.cshtml", "first theme content")
 
-        let content = Layout.page ()
+        let content = Layout.page (TestHelpers.buildContext paths)
 
         test <@ content = "first theme content" @>
     )
 
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        TestHelpers.setupWorkspace "second"
-        File.WriteAllText($"{Config.contentDirectory}/themes/second/layout/page.cshtml", "second theme content")
+    TestHelpers.withTempSite (fun paths ->
+        TestHelpers.setupWorkspace paths "second"
+        File.WriteAllText(SitePaths.inWorkspace paths "themes/second/layout/page.cshtml", "second theme content")
 
-        let content = Layout.page ()
+        let content = Layout.page (TestHelpers.buildContext paths)
 
         test <@ content = "second theme content" @>
     )

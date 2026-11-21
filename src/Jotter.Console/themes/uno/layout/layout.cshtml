@@ -25,28 +25,27 @@
   <meta property="og:description" content="@Model.config.description">
   
 
-  <link rel="apple-touch-icon" sizes="57x57" href="assets/img/favicons/apple-touch-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="60x60" href="assets/img/favicons/apple-touch-icon-60x60.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="assets/img/favicons/apple-touch-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicons/apple-touch-icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="assets/img/favicons/apple-touch-icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="assets/img/favicons/apple-touch-icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="assets/img/favicons/apple-touch-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="assets/img/favicons/apple-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicons/apple-touch-icon-180x180.png">
-  <link rel="icon" type="image/png" href="assets/img/favicons/favicon-32x32.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="assets/img/favicons/favicon-194x194.png" sizes="194x194">
-  <link rel="icon" type="image/png" href="assets/img/favicons/favicon-96x96.png" sizes="96x96">
-  <link rel="icon" type="image/png" href="assets/img/favicons/android-chrome-192x192.png" sizes="192x192">
-  <link rel="icon" type="image/png" href="assets/img/favicons/favicon-16x16.png" sizes="16x16">
-  <link rel="manifest" href="assets/img/favicons/manifest.json">
-  <link rel="shortcut icon" href="assets/img/favicons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/img/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/img/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/img/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/assets/img/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/img/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/assets/img/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/img/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="/assets/img/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/assets/img/favicon-194x194.png" sizes="194x194">
+  <link rel="icon" type="image/png" href="/assets/img/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/assets/img/android-chrome-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="/assets/img/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="/assets/img/manifest.json">
+  <link rel="shortcut icon" href="/assets/img/favicon.ico">
   <meta name="msapplication-TileColor" content="#ffc40d">
-  <meta name="msapplication-TileImage" content="assets/img/favicons/mstile-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
   @Raw(Model.css)
-  <link rel="canonical" href="@Model.config.url">
+  <link rel="canonical" href="@Model.path">
   <link rel="alternate" type="application/rss+xml" title="@Model.config.name" href="/blog.rss">
   @if (!System.String.IsNullOrWhiteSpace(Model.config.googleAnalyticsId)) {
     @Raw(Jotter.Core.GA.render(Model.config.googleAnalyticsId))
@@ -64,9 +63,9 @@
 			<div class="panel-main__inner panel-inverted">
 			<div class="panel-main__content">
         
-				<img src="assets/img/logo.png" class="user-image" alt="My Profile Photo">
+				<img src="/assets/img/logo.png" class="user-image" alt="My Profile Photo">
 				<h1 class="panel-cover__title panel-title">
-					<a href="/" title="link to home">@Model.config.author</a><a href="https://www.github.com/cyberdot" title="cyberdot" target="_blank">@Model.config.author</a>
+					<a href="/" title="link to home">@Model.config.author</a><a href="https://github.com/@Model.config.github" title="@Model.config.github on GitHub" target="_blank">@Model.config.author</a>
 				</h1>
 
 				<hr class="panel-cover__divider">
@@ -86,7 +85,7 @@
 						<ul class="navigation">					
 							<!-- Twitter -->
 							  <li class="navigation__item">
-								<a href="http://twitter.com/{twitter_username}" title="{twitter_username} on Twitter" target="_blank">
+								<a href="https://twitter.com/@Model.config.twitter" title="@Model.config.twitter on Twitter" target="_blank">
 								  <i class="icon icon-social-twitter"></i>
 								  <span class="label">Twitter</span>
 								</a>
@@ -94,7 +93,7 @@
 							  
 							  <!-- LinkedIn -->
 							  <li class="navigation__item">
-								<a href="https://www.linkedin.com/in/{ln_username}" title="{ln_username} on LinkedIn" target="_blank">
+								<a href="https://www.linkedin.com/in/@Model.config.linkedIn" title="@Model.config.linkedIn on LinkedIn" target="_blank">
 									<i class="icon icon-social-linkedin"></i>
 									<span class="label">LinkedIn</span>
 								</a>
@@ -102,7 +101,7 @@
 							  
 							  <!-- GitHub -->
 							  <li class="navigation__item">
-								<a href="https://www.github.com/{github_username}" title="{github_username} on GitHub" target="_blank">
+								<a href="https://github.com/@Model.config.github" title="@Model.config.github on GitHub" target="_blank">
 									<i class="icon icon-social-github"></i>
 									<span class="label">GitHub</span>
 								</a>
@@ -110,7 +109,7 @@
 							  
 							  <!-- Email -->
 							  <li class="navigation__item">
-								<a href="mailto:{user_email}" title="Email {user_email}" target="_blank">
+								<a href="mailto:@Model.config.email" title="Email @Model.config.email" target="_blank">
 									<i class="icon icon-mail"></i>
 									<span class="label">Email</span>
 								</a>

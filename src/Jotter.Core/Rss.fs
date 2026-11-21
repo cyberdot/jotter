@@ -12,10 +12,8 @@ module Rss =
     
     let rssFileName = "blog.rss"
     
-    let buildItem post =
-        let config = Config.data()
-        let url = $"{config.url}/posts/{post.filename}"
-        
+    let buildItem (config: ConfigurationModel) post =
+        let url = OutputUrls.post config post.filename
         let item = SyndicationItem()
         item.Title <- TextSyndicationContent(post.frontmatter.title)
         item.Summary <- TextSyndicationContent(post.frontmatter.description)
@@ -24,7 +22,8 @@ module Rss =
         item.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(url, UriKind.RelativeOrAbsolute)))
         item
         
-    let compileRss (posts: Post list) = posts |> Seq.map (fun p -> buildItem p)
+    let compileRss (config: ConfigurationModel) (posts: Post list) =
+        posts |> Seq.map (buildItem config)
 
     // Feed readers expect newest-first regardless of how the site's own pagination is
     // configured to sort, and an unbounded feed grows forever as a blog accumulates posts.
@@ -35,9 +34,7 @@ module Rss =
         |> List.sortByDescending (fun p -> p.dateCreated)
         |> List.truncate maxItems
 
-    let buildFeed (posts: Post list) =
-        let config = Config.data()
-
+    let buildFeed (config: ConfigurationModel) (posts: Post list) =
         let feed = SyndicationFeed()
         feed.Title <- TextSyndicationContent(config.name)
         feed.Id <- config.url
@@ -46,23 +43,23 @@ module Rss =
         feed.Language <- config.language
         feed.Links.Add(SyndicationLink.CreateAlternateLink(new Uri(config.url, UriKind.RelativeOrAbsolute)))
 
-        feed.Items <- compileRss posts
+        feed.Items <- compileRss config posts
 
         feed
 
     // `use`, not a bare `Close()` call after `WriteTo`: if WriteTo throws (e.g. a post's
     // title contains a character XmlWriter rejects), the old code left the file handle open
     // for the rest of the process.
-    let writeToFile (feed: SyndicationFeed) =
+    let writeToFile (paths: SitePaths) (feed: SyndicationFeed) =
         let rssFormatter = Rss20FeedFormatter(feed)
-        use rssWriter = XmlWriter.Create($"{Config.publicDirectory}/{rssFileName}")
+        use rssWriter = XmlWriter.Create(SitePaths.inPublic paths rssFileName)
         rssFormatter.WriteTo(rssWriter)
 
-    let create (posts: Post list) =
+    let create (context: BuildContext) (posts: Post list) =
         posts
         |> selectFeedPosts
-        |> buildFeed
-        |> writeToFile
+        |> buildFeed context.config
+        |> writeToFile context.paths
         
         
         

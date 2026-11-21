@@ -100,13 +100,26 @@ to a tracking ID; leave it blank, the default, to leave Analytics out of the sit
 dotnet test Jotter.slnx
 ```
 
+The suite includes complete multi-page builds for every bundled theme and validates local
+links in generated HTML.
+
+## Build safety
+
+Builds are staged in a temporary directory and replace `_public` only after parsing, rendering,
+and local-link validation succeed. If a build fails, the previous `_public` remains intact.
+
+Configuration and front matter are validated once per build. Expected content and build errors
+are reported as concise CLI messages.
+
+The preview server serves `_public` directly and reports an actionable error if the site has
+not been built.
+
 ## CI/CD
 
 Two GitHub Actions workflows live under `.github/workflows`:
 
-- **Build and Test** (`build.yml`) — builds the solution and runs the full test suite on every branch
-  push and on every pull request opened or updated. A merged PR is covered too, since merging pushes
-  a commit to the base branch.
+- **Build and Test** (`build.yml`) — builds the solution and runs the full test suite on pushes,
+  pull requests, and manual dispatches. Superseded runs on the same ref are cancelled.
 - **Release** (`release.yml`) — manually triggered (`workflow_dispatch`). Builds and tests `master`,
   publishes self-contained, versioned Jotter.Console executables for Windows, Linux, and macOS
   (win-x64, linux-x64, osx-x64), tags `master` with that version, and creates a GitHub release with

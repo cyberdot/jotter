@@ -6,14 +6,11 @@ open Jotter.Core.Config
 
 module Layout =
 
-    // A plain `let basePath = ...` here would be a module-level value: computed once, on
-    // the first call into this module, and then cached as a field for the rest of the
-    // process - every later call would keep reading whatever theme/config.json was current
-    // at that first touch, however stale. Making it a function re-reads it every time.
-    let private basePath () = $"{Config.contentDirectory}/themes/{Theme.current()}/layout"
+    let private basePath (context: BuildContext) =
+        SitePaths.inWorkspace context.paths $"themes/{context.config.theme}/layout"
 
-    let private toFileName (template: string) =
-        let dirInfo = new DirectoryInfo(basePath())
+    let private toFileName (context: BuildContext) (template: string) =
+        let dirInfo = new DirectoryInfo(basePath context)
         let files = dirInfo.GetFiles() |> Array.map (fun fileInfo -> fileInfo.Name)
         let result = files |> Array.tryFind (fun f -> Path.ChangeExtension(f, null) = template)
         match result with
@@ -21,42 +18,43 @@ module Layout =
            | None -> ""
 
 
-    let private toPath (fileName: string) =
+    let private toPath (context: BuildContext) (fileName: string) =
         if System.String.IsNullOrWhiteSpace(fileName) then null
-        else $"{basePath()}/{fileName}"
+        else Path.Combine(basePath context, fileName)
 
     // RazorLight renders every template the same way regardless of its file extension, so
     // only the content itself is worth returning - the extension used to be threaded all
     // the way out to Renderer.render, which ignored it too.
-    let rec private read (fallback: string) (path: string) : string =
+    let rec private read (context: BuildContext) (fallback: string) (path: string) : string =
        if (System.String.IsNullOrWhiteSpace(fallback)) then
            File.ReadAllText(path)
        elif(System.String.IsNullOrWhiteSpace(path)) then
-           fallback |> toFileName |> toPath |> read null
-       else read null path
+           fallback |> toFileName context |> toPath context |> read context null
+       else read context null path
 
 
-    let private load (template: string) (fallback: string) : string =
-       let fileP = template |> toFileName |> toPath
+    let private load (context: BuildContext) (template: string) (fallback: string) : string =
+       let fileP = template |> toFileName context |> toPath context
        if(fileP = null && System.String.IsNullOrWhiteSpace(fallback)) then
            null
        else
-           fileP |> read fallback
+           fileP |> read context fallback
 
     
-    let private resolveLayout (template: string) = load template "layout"  
+    let private resolveLayout (context: BuildContext) (template: string) =
+        load context template "layout"
     
     
-    let tagIndex () = load "tag_index" ""
-    let tagLayout () = resolveLayout "tag_layout"
+    let tagIndex (context: BuildContext) = load context "tag_index" ""
+    let tagLayout (context: BuildContext) = resolveLayout context "tag_layout"
     
-    let indexLayout () = resolveLayout "index_layout"
-    let index () = load "index" ""
+    let indexLayout (context: BuildContext) = resolveLayout context "index_layout"
+    let index (context: BuildContext) = load context "index" ""
     
-    let pageLayout ()= resolveLayout "page_layout"
-    let page () = load "page" ""
+    let pageLayout (context: BuildContext)= resolveLayout context "page_layout"
+    let page (context: BuildContext) = load context "page" ""
     
-    let postLayout () = resolveLayout "post_layout"
-    let post () = load "post" ""
+    let postLayout (context: BuildContext) = resolveLayout context "post_layout"
+    let post (context: BuildContext) = load context "post" ""
     
-    let layout ()= load "layout" ""
+    let layout (context: BuildContext)= load context "layout" ""

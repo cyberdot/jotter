@@ -7,8 +7,8 @@
 		<title>@Model.config.name</title>
 		<meta name="author" content="@Model.config.author"/>
 		<meta name="generator" content="Jotter 0.1.0"/>
-		<link href='assets/img/favicon.ico' rel='icon' type='image/x-icon'/>
-		<link rel="alternate" href="blog.rss" type="application/rss+xml" title="@Model.config.name">
+		<link href='/assets/img/favicon.ico' rel='icon' type='image/x-icon'/>
+		<link rel="alternate" href="/blog.rss" type="application/rss+xml" title="@Model.config.name">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"/>
@@ -36,13 +36,13 @@
 				<div class="collapse navbar-collapse" id="main-navbar">
 					<ul class="nav navbar-nav navbar-right">
 						<li><a title="Blog" href="@Model.config.url">Blog</a></li>
-						<li><a title="About" href="about.html">About</a></li>
+						<li><a title="About" href="/about.html">About</a></li>
 					</ul>
 				</div>
 				<div class="avatar-container">
 				<div class="avatar-img-border">
 					<a title="@Model.config.name" href="@Model.config.url">
-						<img class="avatar-img" src="assets/img/avatar-icon.png" alt="@Model.config.name"/>
+						<img class="avatar-img" src="/assets/img/avatar-icon.png" alt="@Model.config.name"/>
 					</a>
 				</div>
 			</div>
