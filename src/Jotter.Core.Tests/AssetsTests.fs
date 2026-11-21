@@ -5,48 +5,55 @@ open Xunit
 open Swensen.Unquote
 open Jotter.Core
 
-[<Fact>]
-let ``css links only .css files and keeps their subpath`` () =
-    TestHelpers.withTempSite (fun paths ->
-        let cssDir = SitePaths.inPublic paths "assets/css"
-        Directory.CreateDirectory($"{cssDir}/sub") |> ignore
-        File.WriteAllText($"{cssDir}/site.css", "")
-        File.WriteAllText($"{cssDir}/sub/nested.css", "")
-        File.WriteAllText($"{cssDir}/notes.txt", "")
+let private setupDeclaredAssets (paths: SitePaths) (styles: string list) (scripts: string list) =
+    TestHelpers.setupWorkspace paths "test"
+    let root = SitePaths.inWorkspace paths "themes/test"
+    for path in styles @ scripts do
+        let fullPath = Path.Combine(root, path.Replace('/', Path.DirectorySeparatorChar))
+        let directory = Path.GetDirectoryName(fullPath)
+        Directory.CreateDirectory(directory |> nonNull) |> ignore
+        File.WriteAllText(fullPath, "")
+    let styleJson = styles |> List.map Newtonsoft.Json.JsonConvert.SerializeObject |> String.concat ", "
+    let scriptJson = scripts |> List.map Newtonsoft.Json.JsonConvert.SerializeObject |> String.concat ", "
+    let manifest =
+        $"""{{ "schemaVersion": 1, "id": "test", "name": "test", "version": "1.0.0", "jotter": ">=1.0.0 <2.0.0",
+              "templates": {{ "base": "layout/layout.cshtml", "index": "layout/index.cshtml", "post": "layout/post.cshtml", "page": "layout/page.cshtml" }},
+              "assets": {{ "styles": [{styleJson}], "scripts": [{scriptJson}] }}, "features": ["posts"] }}"""
+    File.WriteAllText(Path.Combine(root, "theme.json"), manifest)
 
-        let links = Assets.css paths.publicDirectory (SitePaths.inPublic paths "index.html")
+[<Fact>]
+let ``css links follow manifest declarations and preserve nested paths`` () =
+    TestHelpers.withTempSite (fun paths ->
+        setupDeclaredAssets paths
+            [ "assets/css/site.css"; "assets/css/sub/nested.css" ]
+            []
+
+        let links = Assets.css (TestHelpers.buildContext paths)
 
         test <@ links.Contains("href=\"/assets/css/site.css\"") @>
         test <@ links.Contains("href=\"/assets/css/sub/nested.css\"") @>
-        test <@ not (links.Contains("notes.txt")) @>
     )
 
 [<Fact>]
-let ``js links only .js files, excluding non-js files in the same directory`` () =
+let ``js links only declared scripts and ignore nearby CSS files`` () =
     TestHelpers.withTempSite (fun paths ->
-        // Mirrors pyxill's real layout: assets/js/styles/*.css are highlight.js theme
-        // stylesheets, not scripts, and must not be linked as <script> tags.
-        let jsDir = SitePaths.inPublic paths "assets/js"
-        Directory.CreateDirectory($"{jsDir}/styles") |> ignore
-        File.WriteAllText($"{jsDir}/site.js", "")
-        File.WriteAllText($"{jsDir}/styles/theme.css", "")
-        File.WriteAllText($"{jsDir}/readme.txt", "")
+        setupDeclaredAssets paths [] [ "assets/js/site.js" ]
+        let root = SitePaths.inWorkspace paths "themes/test"
+        Directory.CreateDirectory(Path.Combine(root, "assets/js/styles")) |> ignore
+        File.WriteAllText(Path.Combine(root, "assets/js/styles/theme.css"), "")
 
-        let links = Assets.js paths.publicDirectory (SitePaths.inPublic paths "index.html")
+        let links = Assets.js (TestHelpers.buildContext paths)
 
         test <@ links.Contains("src=\"/assets/js/site.js\"") @>
         test <@ not (links.Contains("theme.css")) @>
-        test <@ not (links.Contains("readme.txt")) @>
     )
 
 [<Fact>]
-let ``js keeps a nested file's subpath instead of flattening it to its bare name`` () =
+let ``script asset declaration preserves nested paths`` () =
     TestHelpers.withTempSite (fun paths ->
-        let jsDir = SitePaths.inPublic paths "assets/js"
-        Directory.CreateDirectory($"{jsDir}/vendor") |> ignore
-        File.WriteAllText($"{jsDir}/vendor/highlight.js", "")
+        setupDeclaredAssets paths [] [ "assets/js/vendor/highlight.js" ]
 
-        let links = Assets.js paths.publicDirectory (SitePaths.inPublic paths "index.html")
+        let links = Assets.js (TestHelpers.buildContext paths)
 
         test <@ links.Contains("src=\"/assets/js/vendor/highlight.js\"") @>
     )

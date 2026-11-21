@@ -82,4 +82,56 @@ let main argv =
         execute(fun () -> Jotter.Core.ServerTask.run paths (pr.GetValue(urlsOption)))))
     root.Add(serverCmd)
 
+    let themeCmd = Command("theme", "List, validate, copy, and create themes")
+
+    let themeListCmd = Command("list", "List bundled themes")
+    themeListCmd.SetAction(Func<ParseResult, int>(fun _ ->
+        execute(fun () ->
+            Jotter.Core.Theme.loadCatalog paths
+            |> List.iter (fun theme -> Console.WriteLine($"{theme.id}\t{theme.name}\t{theme.description}")))))
+    themeCmd.Add(themeListCmd)
+
+    let themeValidateCmd = Command("validate", "Validate bundled and project-local themes")
+    let validateThemeArg = Argument<string>("theme")
+    validateThemeArg.Arity <- ArgumentArity.ZeroOrOne
+    themeValidateCmd.Add(validateThemeArg)
+    themeValidateCmd.SetAction(Func<ParseResult, int>(fun pr ->
+        execute(fun () ->
+            let id = pr.GetValue(validateThemeArg)
+            Jotter.Core.Theme.validate paths (if String.IsNullOrWhiteSpace(id) then None else Some id)
+            match id with
+            | null -> Console.WriteLine("All available themes are valid.")
+            | value -> Console.WriteLine($"Theme '{value}' is valid."))))
+    themeCmd.Add(themeValidateCmd)
+
+    let themeCopyCmd = Command("copy", "Copy a bundled theme into this site's workspace")
+    let copyThemeArg = Argument<string>("theme")
+    themeCopyCmd.Add(copyThemeArg)
+    themeCopyCmd.SetAction(Func<ParseResult, int>(fun pr ->
+        execute(fun () -> Jotter.Core.Theme.copyToProject paths (pr.GetValue(copyThemeArg)))))
+    themeCmd.Add(themeCopyCmd)
+
+    let themeNewCmd = Command("new", "Create a new project-local theme")
+    let newThemeArg = Argument<string>("theme")
+    themeNewCmd.Add(newThemeArg)
+    themeNewCmd.SetAction(Func<ParseResult, int>(fun pr ->
+        execute(fun () ->
+            let id = pr.GetValue(newThemeArg)
+            Jotter.Core.Theme.createProjectTheme paths id
+            let createdPath = Jotter.Core.SitePaths.inWorkspace paths (Path.Combine("themes", id))
+            Console.WriteLine($"Created theme at {createdPath}"))))
+    themeCmd.Add(themeNewCmd)
+
+    let themeUseCmd = Command("use", "Select an installed project-local theme")
+    let useThemeArg = Argument<string>("theme")
+    themeUseCmd.Add(useThemeArg)
+    themeUseCmd.SetAction(Func<ParseResult, int>(fun pr ->
+        execute(fun () ->
+            let id = pr.GetValue(useThemeArg)
+            Jotter.Core.Theme.useProjectTheme paths id
+            Console.WriteLine($"Theme '{id}' selected."))))
+    themeCmd.Add(themeUseCmd)
+
+    root.Add(themeCmd)
+
     root.Parse(argv).Invoke()

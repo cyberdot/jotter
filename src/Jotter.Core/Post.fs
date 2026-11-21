@@ -84,8 +84,8 @@ module Post =
 
         let dvm = {
                      config = config;
-                     js = Assets.js context.paths.publicDirectory htmlPath;
-                     css = Assets.css context.paths.publicDirectory htmlPath;
+                     js = Assets.js context;
+                     css = Assets.css context;
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;

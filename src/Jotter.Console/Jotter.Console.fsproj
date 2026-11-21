@@ -6,8 +6,8 @@
 		<WarnOn>3390;$(WarnOn)</WarnOn>
 	</PropertyGroup>
 
-	<!-- Theme files below are Content, not compiled resources: they must be copied next to the
-	     executable so `jotter init <theme>` can find and copy them at runtime. -->
+	<!-- Theme catalog and metadata ship next to the executable as content. Runtime discovery
+	     is driven by themes.json, with only the selected theme copied into a new site. -->
 	<ItemDefinitionGroup>
 		<Content>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -24,7 +24,9 @@
 	     Elixir port, while the real files are .cshtml), which went unnoticed because CopyToOutputDirectory
 	     wasn't set. A single glob avoids that drift. -->
 	<ItemGroup>
-		<Content Include="themes\**\*" />
+		<Content Include="..\..\themes\**\*">
+			<Link>themes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</Content>
 		<Content Include="site_files\**\*" />
 	</ItemGroup>
 

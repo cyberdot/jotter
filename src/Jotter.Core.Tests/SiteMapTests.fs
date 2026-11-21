@@ -8,7 +8,8 @@ open Jotter.Core
 [<Fact>]
 let ``homeEntry gets the top priority`` () =
     TestHelpers.withTempSite (fun paths ->
-        let context = { paths = paths; config = TestHelpers.sampleConfig; builtAt = DateTimeOffset.UtcNow }
+        TestHelpers.setupWorkspace paths "test"
+        let context = TestHelpers.buildContext paths
         test <@ (SiteMap.homeEntry context).priority = "1.0" @>
     )
 
@@ -25,7 +26,8 @@ let ``postEntry uses the post's own created date, not the build date`` () =
 [<Fact>]
 let ``pageEntry gets a lower priority than the home page and than posts`` () =
     TestHelpers.withTempSite (fun paths ->
-        let context = { paths = paths; config = TestHelpers.sampleConfig; builtAt = DateTimeOffset.UtcNow }
+        TestHelpers.setupWorkspace paths "test"
+        let context = TestHelpers.buildContext paths
         let entry = SiteMap.pageEntry context "about.html"
         test <@ entry.priority = "0.5" @>
     )

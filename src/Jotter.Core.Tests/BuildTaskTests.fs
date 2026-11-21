@@ -59,26 +59,21 @@ let ``output validation rejects broken local asset references`` () =
         | Error errors -> test <@ errors |> List.exists (fun error -> error.Contains("missing.css")) @>
     )
 
-[<Theory>]
-[<InlineData("architect")>]
-[<InlineData("beautifuld")>]
-[<InlineData("hyde")>]
-[<InlineData("poole")>]
-[<InlineData("pyxill")>]
-[<InlineData("uno")>]
-[<InlineData("whisper")>]
-let ``every bundled theme renders a complete multi-page site`` (theme: string) =
-    TestHelpers.withTempSite (fun paths ->
-        Site.init paths theme false
-        let config = File.ReadAllText(paths.configFile)
-        File.WriteAllText(paths.configFile, config.Replace("\"posts_per_page\": 10", "\"posts_per_page\": 1"))
-        Post.create paths "Another Post" false
+[<Fact>]
+let ``every bundled catalog theme renders a complete multi-page site`` () =
+    TestHelpers.withTempSite (fun catalogPaths ->
+        for theme in Theme.available catalogPaths do
+            TestHelpers.withTempSite (fun paths ->
+                Site.init paths theme false
+                let config = File.ReadAllText(paths.configFile)
+                File.WriteAllText(paths.configFile, config.Replace("\"posts_per_page\": 10", "\"posts_per_page\": 1"))
+                Post.create paths "Another Post" false
 
-        BuildTask.run paths
+                BuildTask.run paths
 
-        test <@ File.Exists(SitePaths.inPublic paths "index.html") @>
-        test <@ File.Exists(SitePaths.inPublic paths "index2.html") @>
-        test <@ File.Exists(SitePaths.inPublic paths "tags/new.html") @>
-        test <@ File.Exists(SitePaths.inPublic paths "tags/new2.html") @>
+                test <@ File.Exists(SitePaths.inPublic paths "index.html") @>
+                test <@ File.Exists(SitePaths.inPublic paths "index2.html") @>
+                test <@ File.Exists(SitePaths.inPublic paths "tags/new.html") @>
+                test <@ File.Exists(SitePaths.inPublic paths "tags/new2.html") @>)
     )
 

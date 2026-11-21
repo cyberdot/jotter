@@ -67,6 +67,13 @@ let setupMinimalTheme (paths: SitePaths) (theme: string) =
     File.WriteAllText($"{dir}/page.cshtml", minimalPassthroughCshtml)
     File.WriteAllText($"{dir}/post.cshtml", minimalPassthroughCshtml)
     File.WriteAllText($"{dir}/index.cshtml", minimalIndexCshtml)
+    Directory.CreateDirectory(SitePaths.inWorkspace paths $"themes/{theme}/assets") |> ignore
+    File.WriteAllText(
+        SitePaths.inWorkspace paths $"themes/{theme}/theme.json",
+        $"""{{ "schemaVersion": 1, "id": "{theme}", "name": "{theme}", "version": "1.0.0", "jotter": ">=1.0.0 <2.0.0", "author": "Tests", "license": "MIT",
+              "templates": {{ "base": "layout/layout.cshtml", "index": "layout/index.cshtml", "post": "layout/post.cshtml", "page": "layout/page.cshtml" }},
+              "assets": {{ "styles": [], "scripts": [] }}, "features": ["posts", "pages", "tags", "pagination"] }}"""
+    )
 
 // The minimum _workspace/_public structure needed to exercise the build pipeline (config.json
 // plus a bare-bones theme) without depending on the real themes shipped in Jotter.Console.

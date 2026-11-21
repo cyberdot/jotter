@@ -50,7 +50,7 @@ module Site =
        clean paths
        copyRootFiles paths
        Config.init paths theme
-       Theme.init paths
+       Theme.init paths theme
        Draft.init paths
        Page.init paths
        Post.init paths

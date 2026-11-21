@@ -36,8 +36,8 @@ module Tags =
             Path.GetRelativePath(context.paths.publicDirectory, outputPath).Replace('\\', '/')
         {
            config = context.config;
-           js = Assets.js context.paths.publicDirectory outputPath;
-           css = Assets.css context.paths.publicDirectory outputPath;
+           js = Assets.js context;
+           css = Assets.css context;
            content = content;
            tag = tag;
            path = OutputUrls.page pageConfig relativePath;
@@ -74,9 +74,9 @@ module Tags =
         let layout = Layout.layout context
         let index =
             match Layout.tagIndex context with
-            | null ->
+            | None ->
                 """<ul>@foreach(var tag in Model.content) { <li><a href="/tags/@(Jotter.Core.IOUtils.urlSlug(tag)).html">@tag</a></li> }</ul>"""
-            | template -> template
+            | Some template -> template
 
         let indexModel: TagIndexListTemplateModel = { content = tags }
         let indexView = Renderer.render index indexModel
@@ -84,8 +84,8 @@ module Tags =
         let layoutModel: TagIndexLayoutModel =
             { content = indexView
               config = context.config
-              css = Assets.css context.paths.publicDirectory path
-              js = Assets.js context.paths.publicDirectory path
+              css = Assets.css context
+              js = Assets.js context
               path = OutputUrls.page context.config "tags/index.html"
               filename = "index.html" }
 

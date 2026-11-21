@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "themes": [
+    {
+      "id": "architect",
+      "name": "Architect",
+      "path": "architect",
+      "description": "GitHub Pages Architect-inspired theme"
+    },
+    {
+      "id": "beautifuld",
+      "name": "Beautiful D",
+      "path": "beautifuld",
+      "description": "A clean, image-led blog theme"
+    },
+    {
+      "id": "hyde",
+      "name": "Hyde",
+      "path": "hyde",
+      "description": "A Poole-based sidebar theme"
+    },
+    {
+      "id": "poole",
+      "name": "Poole",
+      "path": "poole",
+      "description": "A minimal blog theme with tag navigation"
+    },
+    {
+      "id": "pyxill",
+      "name": "Pyxill",
+      "path": "pyxill",
+      "description": "A compact text-focused theme"
+    },
+    {
+      "id": "uno",
+      "name": "Uno",
+      "path": "uno",
+      "description": "A responsive profile and blog theme"
+    },
+    {
+      "id": "whisper",
+      "name": "Whisper",
+      "path": "whisper",
+      "description": "A minimal Ghost-inspired blog theme"
+    }
+  ]
+}

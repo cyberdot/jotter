@@ -43,8 +43,9 @@ page.
 | Project                 | Purpose                                                                 |
 |--------------------------|--------------------------------------------------------------------------|
 | `src/Jotter.Core`         | Core library: content/config model, Markdown & template rendering, index/tag/RSS/sitemap generation |
-| `src/Jotter.Console`      | Command-line front end (built on `System.CommandLine`) plus the bundled themes |
+| `src/Jotter.Console`      | Command-line front end (built on `System.CommandLine`) |
 | `src/Jotter.Core.Tests`   | Unit tests for `Jotter.Core` (xUnit v3 + [Unquote](https://github.com/SwensenSoftware/unquote) assertions) |
+| `themes/`                 | Git-tracked theme catalog, manifests, templates, and assets |
 
 ## Requirements
 
@@ -75,6 +76,11 @@ Available commands:
 | `publish <title>`     | Move a draft into `_workspace/posts`                        |
 | `build`               | Render everything in `_workspace` into `_public`           |
 | `server`              | Serve the `_public` folder locally for previewing          |
+| `theme list`          | List themes from the bundled catalog                       |
+| `theme validate [id]` | Validate all or one bundled theme                          |
+| `theme copy <id>`     | Copy a bundled theme into the current site                 |
+| `theme new <id>`      | Scaffold a project-local theme                              |
+| `theme use <id>`      | Select an installed project-local theme                     |
 
 Typical workflow:
 
@@ -85,6 +91,15 @@ dotnet run --project src/Jotter.Console -- publish "My first post"
 dotnet run --project src/Jotter.Console -- build
 dotnet run --project src/Jotter.Console -- server
 ```
+
+## Themes
+
+Bundled themes are discovered from [`themes/themes.json`](themes/themes.json). Each theme has a
+`theme.json` manifest declaring its templates and automatically linked CSS/JavaScript assets.
+
+`init` copies only the selected theme into `_workspace/themes`; users can edit that local copy
+without changing bundled themes. Use `theme list` and `theme validate` to inspect and verify the
+catalog, or see [the theme implementation guide](doc/themes.md) when adding a theme.
 
 ## Configuration
 

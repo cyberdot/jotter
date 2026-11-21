@@ -61,8 +61,12 @@ let ``create renders multiple pages for a tag with the shared index model`` () =
 let ``create resolves tag asset links from the tags directory`` () =
     TestHelpers.withTempSite (fun paths ->
         TestHelpers.setupWorkspace paths "test"
-        Directory.CreateDirectory(SitePaths.inPublic paths "assets/css") |> ignore
-        File.WriteAllText(SitePaths.inPublic paths "assets/css/site.css", "")
+        Directory.CreateDirectory(SitePaths.inWorkspace paths "themes/test/assets/css") |> ignore
+        File.WriteAllText(SitePaths.inWorkspace paths "themes/test/assets/css/site.css", "")
+        let manifestPath = SitePaths.inWorkspace paths "themes/test/theme.json"
+        File.WriteAllText(
+            manifestPath,
+            File.ReadAllText(manifestPath).Replace("\"styles\": []", "\"styles\": [\"assets/css/site.css\"]"))
         File.WriteAllText(
             SitePaths.inWorkspace paths "themes/test/layout/layout.cshtml",
             """<html><head>@Raw(Model.css)</head><body>@Raw(Model.content)</body></html>""")

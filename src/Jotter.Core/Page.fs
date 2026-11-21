@@ -56,8 +56,8 @@ module Page =
     let private layoutViewModel (context: BuildContext) (outputPath: string) (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
         {
            config = context.config;
-           js = Assets.js context.paths.publicDirectory outputPath;
-           css = Assets.css context.paths.publicDirectory outputPath;
+           js = Assets.js context;
+           css = Assets.css context;
            content = content;
            frontmatter = frontmatter;
            path = path;

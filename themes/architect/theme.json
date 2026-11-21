@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "architect",
+  "name": "Architect",
+  "version": "1.0.0",
+  "jotter": ">=1.0.0 <2.0.0",
+  "author": "Jotter contributors",
+  "license": "MIT",
+  "templates": {
+    "base": "layout/layout.cshtml",
+    "index": "layout/index.cshtml",
+    "post": "layout/post.cshtml",
+    "page": "layout/page.cshtml"
+  },
+  "assets": {
+    "styles": [
+      "assets/css/print.css",
+      "assets/css/pygment_trac.css",
+      "assets/css/stylesheet.css"
+    ],
+    "scripts": []
+  },
+  "features": ["posts", "pages", "tags", "pagination"]
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "whisper",
+  "name": "Whisper",
+  "version": "1.0.0",
+  "jotter": ">=1.0.0 <2.0.0",
+  "author": "Jotter contributors",
+  "license": "MIT",
+  "templates": {
+    "base": "layout/layout.cshtml",
+    "index": "layout/index.cshtml",
+    "post": "layout/post.cshtml",
+    "page": "layout/page.cshtml",
+    "postLayout": "layout/post_layout.cshtml",
+    "tagLayout": "layout/tag_layout.cshtml"
+  },
+  "assets": {
+    "styles": [
+      "assets/css/screen.css"
+    ],
+    "scripts": [
+      "assets/js/index.js",
+      "assets/js/jquery.fitvids.js"
+    ]
+  },
+  "features": ["posts", "pages", "tags", "pagination"]
+}

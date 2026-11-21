@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "beautifuld",
+  "name": "Beautiful D",
+  "version": "1.0.0",
+  "jotter": ">=1.0.0 <2.0.0",
+  "author": "Jotter contributors",
+  "license": "MIT",
+  "templates": {
+    "base": "layout/layout.cshtml",
+    "index": "layout/index.cshtml",
+    "post": "layout/post.cshtml",
+    "page": "layout/page.cshtml"
+  },
+  "assets": {
+    "styles": [
+      "assets/css/bootstrap.min.css",
+      "assets/css/highlight.min.css",
+      "assets/css/main.css",
+      "assets/css/pygment_highlights.css"
+    ],
+    "scripts": [
+      "assets/js/bootstrap.min.js",
+      "assets/js/highlight.min.js",
+      "assets/js/jquery-1.11.2.min.js",
+      "assets/js/main.js"
+    ]
+  },
+  "features": ["posts", "pages", "tags", "pagination"]
+}

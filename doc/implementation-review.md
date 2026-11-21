@@ -245,7 +245,7 @@ Aggregate all document errors with the file path and field name before any `_pub
 
 - Post, page, RSS, sitemap, sharing links, canonical links, and static asset links each construct URLs independently.
 - Several Whisper templates use the site URL as a post canonical URL, and its Twitter metadata omits the actual `/posts/<file>` location:
-  [`post_layout.cshtml`](../src/Jotter.Console/themes/whisper/layout/post_layout.cshtml#L20).
+  [`post_layout.cshtml`](../themes/whisper/layout/post_layout.cshtml#L20).
 - A trailing slash in `config.url` can produce double slashes in string concatenation.
 - The `slug` front-matter field is not the authoritative output filename, even though themes use it in sharing metadata.
 
@@ -267,7 +267,7 @@ Construct canonical and sharing metadata from the rendered document's actual fin
 
 [`escapeForJsString`](../src/Jotter.Core/IOUtils.fs#L65) escapes only backslashes and apostrophes. It does not fully address line separators or script-content boundaries.
 
-Whisper templates also interpolate site/post values directly into `application/ld+json` in [`post_layout.cshtml`](../src/Jotter.Console/themes/whisper/layout/post_layout.cshtml#L43).
+Whisper templates also interpolate site/post values directly into `application/ld+json` in [`post_layout.cshtml`](../themes/whisper/layout/post_layout.cshtml#L43).
 
 **Recommended change**
 
@@ -282,9 +282,9 @@ This is defense in depth for generated files. It also reduces malformed metadata
 
 Examples:
 
-- The Architect post heading is malformed at [`architect/layout/post.cshtml`](../src/Jotter.Console/themes/architect/layout/post.cshtml#L2).
-- [`uno/layout/layout.cshtml`](../src/Jotter.Console/themes/uno/layout/layout.cshtml#L69) hard-codes the `cyberdot` account instead of the configured social account.
-- Poole's pagination labels are reversed relative to the usual descending-post semantics in [`poole/layout/index.cshtml`](../src/Jotter.Console/themes/poole/layout/index.cshtml#L17).
+- The Architect post heading is malformed at [`architect/layout/post.cshtml`](../themes/architect/layout/post.cshtml#L2).
+- [`uno/layout/layout.cshtml`](../themes/uno/layout/layout.cshtml#L69) hard-codes the `cyberdot` account instead of the configured social account.
+- Poole's pagination labels are reversed relative to the usual descending-post semantics in [`poole/layout/index.cshtml`](../themes/poole/layout/index.cshtml#L17).
 - Canonical, Open Graph, JSON-LD, RSS, asset, and social URLs vary between themes.
 - Several old hard-coded footer years, product versions, and external dependencies differ by theme.
 

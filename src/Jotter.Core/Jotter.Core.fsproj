@@ -10,6 +10,7 @@
 		<Compile Include="SitePaths.fs" />
 		<Compile Include="IOUtils.fs" />
 		<Compile Include="Config.fs" />
+		<Compile Include="Theme.fs" />
 		<Compile Include="BuildContext.fs" />
 		<Compile Include="OutputUrls.fs" />
 		<Compile Include="Document.fs" />
@@ -17,7 +18,6 @@
 		<Compile Include="ViewModels.fs" />
 		<Compile Include="Renderer.fs" />
 		<Compile Include="StructuredData.fs" />
-		<Compile Include="Theme.fs" />
 		<Compile Include="Layout.fs" />
 		<Compile Include="Assets.fs" />
 		<Compile Include="GA.fs" />

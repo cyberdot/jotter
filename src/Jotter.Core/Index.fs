@@ -36,8 +36,8 @@ module Index =
     let private createLayoutViewModel (context: BuildContext) (outputPath: string) (content: string) =
         {
            config = context.config;
-           js = Assets.js context.paths.publicDirectory outputPath;
-           css = Assets.css context.paths.publicDirectory outputPath;
+           js = Assets.js context;
+           css = Assets.css context;
            content = content;
            path =
                OutputUrls.page

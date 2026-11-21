@@ -62,9 +62,8 @@ let ``buildFeed includes a feed-level link, not just per-item links`` () =
 [<Fact>]
 let ``create releases the rss file even when writing the feed fails`` () =
     TestHelpers.withTempSite (fun paths ->
-        Directory.CreateDirectory(paths.workspace) |> ignore
+        TestHelpers.setupWorkspace paths "test"
         Directory.CreateDirectory(paths.publicDirectory) |> ignore
-        Config.init paths "test"
 
         let invalidPost =
             { TestHelpers.samplePost "bad.html" with
