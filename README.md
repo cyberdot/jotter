@@ -570,7 +570,8 @@ Use `linux-x64` or `osx-x64` as the runtime where appropriate.
 
 ## CI and releases
 
-- `build.yml` builds, tests, and packs the tool on pushes, pull requests, and manual dispatch.
+- `build.yml` builds, tests, and packs the tool after a pull request is merged into `master`, or
+  when triggered manually.
 - `release.yml` is manually triggered.
 - A release version can be explicit (`1.4.0`) or omitted to increment the latest `vX.Y.Z` patch.
 - Release output includes:

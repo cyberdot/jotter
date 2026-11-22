@@ -51,8 +51,8 @@ jobs:
 
           $tag = "v$version"
 
-          git rev-parse $tag 2>$null | Out-Null
-          if ($LASTEXITCODE -eq 0) {
+          $existingTag = git tag --list $tag
+          if ($existingTag -and $LASTEXITCODE -eq 0) {
             Write-Output "::error::Tag $tag already exists."
             exit 1
           }
@@ -60,6 +60,7 @@ jobs:
           Write-Output "Releasing $tag"
           Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$version"
           Add-Content -Path $env:GITHUB_OUTPUT -Value "tag=$tag"
+          exit 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
