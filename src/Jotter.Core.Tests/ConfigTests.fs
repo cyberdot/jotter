@@ -7,12 +7,12 @@ open Jotter.Core
 
 [<Fact>]
 let ``init defaults new sites to descending sort so Older/Newer labels aren't backwards`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory(Config.contentDirectory) |> ignore
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(paths.workspace) |> ignore
 
-        Config.init "test"
+        Config.init paths "test"
 
-        test <@ (Config.data()).sortPosts = "descending" @>
+        test <@ (Config.load paths).sortPosts = Config.PostSort.Descending @>
     )
 
 // Index.compileIndex/Tags.compileIndex skip postsPerPage posts per page; postsPerPage <= 0
@@ -20,21 +20,31 @@ let ``init defaults new sites to descending sort so Older/Newer labels aren't ba
 // index pages forever instead of failing with a clear error.
 [<Fact>]
 let ``data rejects a posts_per_page of zero instead of letting pagination loop forever`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory(Config.contentDirectory) |> ignore
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(paths.workspace) |> ignore
         File.WriteAllText(
-            Config.filePath,
+            paths.configFile,
             """{ "posts_per_page": 0, "sort_posts": "descending", "theme": "test" }"""
         )
 
-        Assert.Throws<exn>(fun () -> Config.data() |> ignore) |> ignore
+        Assert.Throws<BuildException>(fun () -> Config.load paths |> ignore) |> ignore
     )
 
 [<Fact>]
 let ``data rejects a missing posts_per_page the same way as zero`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory(Config.contentDirectory) |> ignore
-        File.WriteAllText(Config.filePath, """{ "sort_posts": "descending", "theme": "test" }""")
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(paths.workspace) |> ignore
+        File.WriteAllText(paths.configFile, """{ "sort_posts": "descending", "theme": "test" }""")
 
-        Assert.Throws<exn>(fun () -> Config.data() |> ignore) |> ignore
+        Assert.Throws<BuildException>(fun () -> Config.load paths |> ignore) |> ignore
+    )
+
+[<Fact>]
+let ``load rejects an unknown sort order instead of silently using source order`` () =
+    TestHelpers.withTempSite (fun paths ->
+        Config.init paths "test"
+        let content = File.ReadAllText(paths.configFile).Replace("\"sort_posts\": \"descending\"", "\"sort_posts\": \"sideways\"")
+        File.WriteAllText(paths.configFile, content)
+
+        Assert.Throws<BuildException>(fun () -> Config.load paths |> ignore) |> ignore
     )

@@ -1,5 +1,6 @@
 module Jotter.Core.Tests.DocumentTests
 
+open System.IO
 open Xunit
 open Swensen.Unquote
 open Jotter.Core
@@ -10,11 +11,15 @@ let ``fileName replaces the markdown extension with html`` () =
 
 [<Fact>]
 let ``htmlFilename builds a path under posts for posts`` () =
-    test <@ Document.htmlFilename true "_workspace/posts/post.markdown" = $"{Config.publicDirectory}/posts/post.html" @>
+    TestHelpers.withTempSite (fun paths ->
+        test <@ Document.htmlFilename paths true "_workspace/posts/post.markdown" = Path.Combine(paths.publicDirectory, "posts", "post.html") @>
+    )
 
 [<Fact>]
 let ``htmlFilename builds a path at the site root for pages`` () =
-    test <@ Document.htmlFilename false "_workspace/pages/about.markdown" = $"{Config.publicDirectory}/about.html" @>
+    TestHelpers.withTempSite (fun paths ->
+        test <@ Document.htmlFilename paths false "_workspace/pages/about.markdown" = Path.Combine(paths.publicDirectory, "about.html") @>
+    )
 
 [<Fact>]
 let ``splitIntoParts parses the JSON front matter and returns the remaining body`` () =
@@ -46,7 +51,17 @@ let ``splitIntoParts handles a closing brace inside a front matter value`` () =
 let ``splitIntoParts fails clearly on an unterminated front matter block`` () =
     let content = "{\"title\":\"T\",\"description\":\"D\"\nBody content here."
 
-    Assert.Throws<exn>(fun () -> Document.splitIntoParts content |> ignore) |> ignore
+    Assert.Throws<BuildException>(fun () -> Document.splitIntoParts content |> ignore) |> ignore
+
+[<Fact>]
+let ``splitIntoParts rejects incomplete front matter with field diagnostics`` () =
+    let content =
+        "{\"description\":\"D\",\"created\":\"2024-01-01T00:00:00+00:00\",\"tags\":[],\"slug\":\"t\"}\nBody."
+
+    let error =
+        Assert.Throws<BuildException>(fun () -> Document.splitIntoParts content |> ignore)
+
+    test <@ error.Message.Contains("title") @>
 
 [<Fact>]
 let ``createExcerpt appends an ellipsis to short content unchanged`` () =

@@ -9,7 +9,7 @@ let ``render embeds the document url and disqus url`` () =
     let html = DisqusComments.render "http://example.com/posts/hello.html" "example.disqus.com"
 
     test <@ html.Contains("http://example.com/posts/hello.html") @>
-    test <@ html.Contains("//example.disqus.com/embed.js") @>
+    test <@ html.Contains("""s.src = "//example.disqus.com/embed.js";""") @>
     test <@ html.Contains("disqus_thread") @>
 
 [<Fact>]
@@ -21,7 +21,7 @@ let ``render does not leak literal backslash escapes into the markup`` () =
 
     test <@ not (html.Contains("\\")) @>
     test <@ html.Contains("""<div id="disqus_thread"></div>""") @>
-    test <@ html.Contains("this.page.url = 'http://example.com/posts/hello.html';") @>
+    test <@ html.Contains("""this.page.url = "http://example.com/posts/hello.html";""") @>
 
 // documentUrl is normally built from the site's own config.url, which is free-form user
 // input - a single quote in there would otherwise close the JS string literal early and
@@ -30,5 +30,4 @@ let ``render does not leak literal backslash escapes into the markup`` () =
 let ``render escapes a single quote in the document url instead of breaking out of the JS string`` () =
     let html = DisqusComments.render "http://example.com/posts/o'brien.html" "example.disqus.com"
 
-    test <@ html.Contains("this.page.url = 'http://example.com/posts/o\\'brien.html';") @>
-    test <@ not (html.Contains("this.page.url = 'http://example.com/posts/o'brien.html'")) @>
+    test <@ html.Contains("""this.page.url = "http://example.com/posts/o'brien.html";""") @>

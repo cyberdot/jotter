@@ -7,28 +7,32 @@ open Jotter.Core
 
 [<Fact>]
 let ``htmlFileName resolves the first page to the configured blog index`` () =
-    test <@ Index.htmlFileName 1 TestHelpers.sampleConfig = $"{Config.publicDirectory}/index.html" @>
+    TestHelpers.withTempSite (fun paths ->
+        test <@ Index.htmlFileName paths 1 TestHelpers.sampleConfig = Path.Combine(paths.publicDirectory, "index.html") @>
+    )
 
 [<Fact>]
 let ``htmlFileName numbers subsequent pages without a duplicate dot`` () =
-    test <@ Index.htmlFileName 2 TestHelpers.sampleConfig = $"{Config.publicDirectory}/index2.html" @>
+    TestHelpers.withTempSite (fun paths ->
+        test <@ Index.htmlFileName paths 2 TestHelpers.sampleConfig = Path.Combine(paths.publicDirectory, "index2.html") @>
+    )
 
 [<Fact>]
 let ``create writes a home page even when there are no posts yet`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        TestHelpers.setupWorkspace "test"
+    TestHelpers.withTempSite (fun paths ->
+        TestHelpers.setupWorkspace paths "test"
 
-        Index.create []
+        Index.create (TestHelpers.buildContext paths) []
 
-        test <@ File.Exists($"{Config.publicDirectory}/index.html") @>
+        test <@ File.Exists(SitePaths.inPublic paths "index.html") @>
     )
 
 [<Fact>]
 let ``create does not write a second page when there are no posts`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        TestHelpers.setupWorkspace "test"
+    TestHelpers.withTempSite (fun paths ->
+        TestHelpers.setupWorkspace paths "test"
 
-        Index.create []
+        Index.create (TestHelpers.buildContext paths) []
 
-        test <@ not (File.Exists($"{Config.publicDirectory}/index2.html")) @>
+        test <@ not (File.Exists(SitePaths.inPublic paths "index2.html")) @>
     )

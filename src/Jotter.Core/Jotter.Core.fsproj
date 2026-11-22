@@ -7,17 +7,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="SitePaths.fs" />
+		<Compile Include="ThemeRepository.fs" />
 		<Compile Include="IOUtils.fs" />
 		<Compile Include="Config.fs" />
-		<Compile Include="Document.fs" />
-		<Compile Include="Renderer.fs" />
-		<Compile Include="IndexPager.fs" />
 		<Compile Include="Theme.fs" />
+		<Compile Include="BuildContext.fs" />
+		<Compile Include="OutputUrls.fs" />
+		<Compile Include="Document.fs" />
+		<Compile Include="IndexPager.fs" />
+		<Compile Include="ViewModels.fs" />
+		<Compile Include="Renderer.fs" />
+		<Compile Include="StructuredData.fs" />
 		<Compile Include="Layout.fs" />
 		<Compile Include="Assets.fs" />
 		<Compile Include="GA.fs" />
 		<Compile Include="DisqusComments.fs" />
-		<Compile Include="Store.fs" />
 		<Compile Include="Page.fs" />
 		<Compile Include="Post.fs" />
 		<Compile Include="Posts.fs" />
@@ -27,6 +32,7 @@
 		<Compile Include="SiteMap.fs" />
 		<Compile Include="Tags.fs" />
 		<Compile Include="Site.fs" />
+		<Compile Include="OutputValidation.fs" />
 		<Compile Include="Tasks\BuildTask.fs" />
 		<Compile Include="Tasks\DraftTask.fs" />
 		<Compile Include="Tasks\PublishTask.fs" />
@@ -37,13 +43,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="FSharp.Formatting" Version="22.2.0" />
-		<PackageReference Include="Giraffe" Version="8.3.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.12" />
 		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="10.0.12" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="RazorLight" Version="2.3.1" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.12" />
 		<PackageReference Include="System.ServiceModel.Syndication" Version="10.0.12" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.12" />
 	</ItemGroup>
 
 </Project>

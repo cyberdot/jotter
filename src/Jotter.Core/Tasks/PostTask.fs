@@ -1,9 +1,9 @@
 namespace Jotter.Core
 
 module PostTask =
-    let run (title: string) =
+    let run (paths: SitePaths) (title: string) =
         if System.String.IsNullOrWhiteSpace(title) then
-            failwith "Cannot create new post without post name"
+            raise (BuildException "Cannot create new post without post name")
         else
-            Post.create title false |> ignore
+            Post.create paths title false |> ignore
 

@@ -1,62 +1,41 @@
 namespace Jotter.Core
 
-open System.IO
-open Jotter.Core.Theme
-open Jotter.Core.Config
+open System
 
 module Layout =
+    let private readRequired (context: BuildContext) (relativePath: string) =
+        Theme.template context.theme (Some relativePath) None
+        |> Option.defaultWith (fun () ->
+            raise (BuildException $"Theme '{context.theme.manifest.id}' requires template '{relativePath}'."))
 
-    // A plain `let basePath = ...` here would be a module-level value: computed once, on
-    // the first call into this module, and then cached as a field for the rest of the
-    // process - every later call would keep reading whatever theme/config.json was current
-    // at that first touch, however stale. Making it a function re-reads it every time.
-    let private basePath () = $"{Config.contentDirectory}/themes/{Theme.current()}/layout"
+    let private resolveLayout (context: BuildContext) (relativePath: string option) =
+        Theme.template context.theme relativePath (Some context.theme.manifest.templates.baseTemplate)
+        |> Option.defaultWith (fun () ->
+            raise (BuildException $"Theme '{context.theme.manifest.id}' has no base layout."))
 
-    let private toFileName (template: string) =
-        let dirInfo = new DirectoryInfo(basePath())
-        let files = dirInfo.GetFiles() |> Array.map (fun fileInfo -> fileInfo.Name)
-        let result = files |> Array.tryFind (fun f -> Path.ChangeExtension(f, null) = template)
-        match result with
-           | Some fileName -> fileName
-           | None -> ""
+    let tagIndex (context: BuildContext) =
+        Theme.template context.theme context.theme.manifest.templates.tagIndex None
 
+    let tagLayout (context: BuildContext) =
+        resolveLayout context context.theme.manifest.templates.tagLayout
 
-    let private toPath (fileName: string) =
-        if System.String.IsNullOrWhiteSpace(fileName) then null
-        else $"{basePath()}/{fileName}"
+    let indexLayout (context: BuildContext) =
+        resolveLayout context context.theme.manifest.templates.indexLayout
 
-    // RazorLight renders every template the same way regardless of its file extension, so
-    // only the content itself is worth returning - the extension used to be threaded all
-    // the way out to Renderer.render, which ignored it too.
-    let rec private read (fallback: string) (path: string) : string =
-       if (System.String.IsNullOrWhiteSpace(fallback)) then
-           File.ReadAllText(path)
-       elif(System.String.IsNullOrWhiteSpace(path)) then
-           fallback |> toFileName |> toPath |> read null
-       else read null path
+    let index (context: BuildContext) =
+        readRequired context context.theme.manifest.templates.index
 
+    let pageLayout (context: BuildContext) =
+        resolveLayout context context.theme.manifest.templates.pageLayout
 
-    let private load (template: string) (fallback: string) : string =
-       let fileP = template |> toFileName |> toPath
-       if(fileP = null && System.String.IsNullOrWhiteSpace(fallback)) then
-           null
-       else
-           fileP |> read fallback
+    let page (context: BuildContext) =
+        readRequired context context.theme.manifest.templates.page
 
-    
-    let private resolveLayout (template: string) = load template "layout"  
-    
-    
-    let tagIndex () = load "tag_index" ""
-    let tagLayout () = resolveLayout "tag_layout"
-    
-    let indexLayout () = resolveLayout "index_layout"
-    let index () = load "index" ""
-    
-    let pageLayout ()= resolveLayout "page_layout"
-    let page () = load "page" ""
-    
-    let postLayout () = resolveLayout "post_layout"
-    let post () = load "post" ""
-    
-    let layout ()= load "layout" ""
+    let postLayout (context: BuildContext) =
+        resolveLayout context context.theme.manifest.templates.postLayout
+
+    let post (context: BuildContext) =
+        readRequired context context.theme.manifest.templates.post
+
+    let layout (context: BuildContext) =
+        readRequired context context.theme.manifest.templates.baseTemplate

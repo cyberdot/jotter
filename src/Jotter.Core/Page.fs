@@ -9,10 +9,8 @@ open Jotter.Core.Config
 open Jotter.Core.Assets
 open Jotter.Core.Layout
 open Jotter.Core.Document
-open Jotter.Core.Store
 open Jotter.Core.IOUtils
 open Jotter.Core.Renderer
-open Jotter.Core.Store
 
 module Page =
 
@@ -52,13 +50,14 @@ module Page =
         """
         
     // Model.path in the page templates must be a public URL, not a filesystem path.
-    let pageUrl (config: ConfigurationModel) (filename: string) = $"{config.url}/{filename}"
+    let pageUrl (config: ConfigurationModel) (filename: string) =
+        OutputUrls.page config filename
 
-    let private layoutViewModel (config: ConfigurationModel) (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
+    let private layoutViewModel (context: BuildContext) (outputPath: string) (content: string) (frontmatter: FrontMatter) (path: string) (filename: string) =
         {
-           config = config;
-           js = Assets.js("..");
-           css = Assets.css("..");
+           config = context.config;
+           js = Assets.js context;
+           css = Assets.css context;
            content = content;
            frontmatter = frontmatter;
            path = path;
@@ -75,47 +74,46 @@ module Page =
            filename = filename;
          }
 
-    let private preparePage (filepath: string) =
-        let layoutTemplate: string = Layout.pageLayout()
-        let pageTemplate: string = Layout.page()
-        let (frontMatter: FrontMatter, content: string) = File.ReadAllText(filepath) |> Document.splitIntoParts
+    let private preparePage (context: BuildContext) (filepath: string) =
+        let layoutTemplate: string = Layout.pageLayout context
+        let pageTemplate: string = Layout.page context
+        let (frontMatter: FrontMatter, content: string) =
+            match File.ReadAllText(filepath) |> Document.trySplitIntoParts with
+            | Ok parts -> parts
+            | Error errors ->
+                raise (BuildException $"{filepath}: {System.String.Join(System.Environment.NewLine, errors)}")
 
-        let config = Config.data()
+        let config = context.config
         let filename = Document.fileName filepath
-        let path = Document.htmlFilename false filepath
+        let path = Document.htmlFilename context.paths false filepath
         let url = pageUrl config filename
 
         let vm = pageViewModel config content frontMatter filename
         let renderedContent = Renderer.render pageTemplate vm
 
-        let lvm = layoutViewModel config renderedContent frontMatter url filename
+        let lvm = layoutViewModel context path renderedContent frontMatter url filename
         let renderedDocument = Renderer.render layoutTemplate lvm
         
         {
           document = renderedDocument; path = path; filename = filename;
         }
         
-    let private pagesDir = $"{Config.contentDirectory}/pages"
+    let private pagesDir (paths: SitePaths) =
+        SitePaths.inWorkspace paths "pages"
     
-    let prepare (mdFile: string) (pages: Page list) =
-        let page = preparePage mdFile
-        Store.addPages pages [page]
-
-    // Building the full list in one pass keeps this O(n) - threading each file through
-    // `prepare` in a loop would call Store.addPages (an O(n) list append) once per file.
-    let prepareAll (files: string seq) : Page list =
-        files |> Seq.map preparePage |> Seq.toList
+    let prepareAll (context: BuildContext) (files: string seq) : Page list =
+        files |> Seq.map (preparePage context) |> Seq.toList
     
-    let create (title: string) =
-        let path = title |> IOUtils.filenameFromTitle pagesDir
+    let create (paths: SitePaths) (title: string) =
+        let path = title |> IOUtils.filenameFromTitle (pagesDir paths)
         let content = defaultPage title
         IOUtils.writeNewFile path content
         
-    let list () = Directory.GetFiles(pagesDir)        
+    let list (paths: SitePaths) = IOUtils.discoverMarkdownFiles (pagesDir paths)
         
-    let init () =
-        Directory.CreateDirectory(pagesDir) |> ignore
-        create "About"
+    let init (paths: SitePaths) =
+        Directory.CreateDirectory(pagesDir paths) |> ignore
+        create paths "About"
         
         
         

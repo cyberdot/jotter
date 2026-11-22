@@ -10,14 +10,14 @@ open Jotter.Core
 // title slugs to the same filename would destroy the first page's content with no warning.
 [<Fact>]
 let ``create refuses to overwrite an existing page with the same slug`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory($"{Config.contentDirectory}/pages") |> ignore
-        let path = $"{Config.contentDirectory}/pages/a-new-page.markdown"
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(SitePaths.inWorkspace paths "pages") |> ignore
+        let path = SitePaths.inWorkspace paths "pages/a-new-page.markdown"
 
-        Page.create "A New Page"
+        Page.create paths "A New Page"
         File.WriteAllText(path, "edited by hand")
 
-        Assert.Throws<exn>(fun () -> Page.create "A New Page") |> ignore
+        Assert.Throws<BuildException>(fun () -> Page.create paths "A New Page") |> ignore
 
         test <@ File.ReadAllText(path) = "edited by hand" @>
     )
@@ -28,9 +28,10 @@ let ``pageUrl builds an absolute URL at the site root, not a filesystem path`` (
 
 [<Fact>]
 let ``prepareAll renders markdown to HTML in the final document instead of discarding it`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        TestHelpers.setupWorkspace "test"
-        let pagesDir = $"{Config.contentDirectory}/pages"
+    TestHelpers.withTempSite (fun paths ->
+        TestHelpers.setupWorkspace paths "test"
+        let context = TestHelpers.buildContext paths
+        let pagesDir = SitePaths.inWorkspace paths "pages"
         Directory.CreateDirectory(pagesDir) |> ignore
         let mdPath = $"{pagesDir}/about.markdown"
         File.WriteAllText(
@@ -38,7 +39,7 @@ let ``prepareAll renders markdown to HTML in the final document instead of disca
             "{\"title\":\"About\",\"description\":\"d\",\"created\":\"2024-01-01T00:00:00+00:00\",\"tags\":[\"page\"],\"slug\":\"about\"}\nThis is **bold** text."
         )
 
-        let pages = Page.prepareAll [ mdPath ]
+        let pages = Page.prepareAll context [ mdPath ]
 
         test <@ pages.Length = 1 @>
         test <@ pages.Head.document.Contains("<strong>bold</strong>") @>
@@ -47,12 +48,12 @@ let ``prepareAll renders markdown to HTML in the final document instead of disca
 
 [<Fact>]
 let ``create stamps new pages with an unambiguous round-trip timestamp`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory($"{Config.contentDirectory}/pages") |> ignore
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(SitePaths.inWorkspace paths "pages") |> ignore
 
-        Page.create "A New Page"
+        Page.create paths "A New Page"
 
-        let content = File.ReadAllText($"{Config.contentDirectory}/pages/a-new-page.markdown")
+        let content = File.ReadAllText(SitePaths.inWorkspace paths "pages/a-new-page.markdown")
         let created = Regex.Match(content, "\"created\":\\s*\"([^\"]+)\"").Groups.[1].Value
 
         // The old "yyyy-MM-dd hh:mm:ssZ" format is a 12-hour clock with no AM/PM marker and a

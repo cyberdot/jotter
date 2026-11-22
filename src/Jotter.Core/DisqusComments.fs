@@ -5,19 +5,19 @@ open Jotter.Core.IOUtils
 module DisqusComments =
 
     let render (documentUrl: string) (disqusUrl: string) =
-       let documentUrl = IOUtils.escapeForJsString documentUrl
-       let disqusUrl = IOUtils.escapeForJsString disqusUrl
+       let documentUrl = IOUtils.serializeForInlineScript documentUrl
+       let disqusUrl = IOUtils.serializeForInlineScript ($"//{disqusUrl}/embed.js")
        $"""
         <div id="disqus_thread"></div>
 			<script>
 			    var disqus_config = function () {{
-                    this.page.url = '{documentUrl}';
-                    this.page.identifier = '{documentUrl}';
+                    this.page.url = {documentUrl};
+                    this.page.identifier = {documentUrl};
                 }};
 
 			(function() {{
                 var d = document, s = d.createElement('script');
-                s.src = '//{disqusUrl}/embed.js';
+                s.src = {disqusUrl};
                 s.setAttribute('data-timestamp', +new Date());
                 (d.head || d.body).appendChild(s);
             }})();

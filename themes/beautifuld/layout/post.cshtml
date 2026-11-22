@@ -1,0 +1,10 @@
+<article>
+  <h1>@Model.frontmatter.title</h1>
+  <p class="post-meta">
+    @Model.frontmatter.created.ToString(Model.config.dateFormat)
+  </p>
+  @Raw(Model.content)
+  @if (Model.config.enableDisqusComments) {
+    @Raw(Jotter.Core.DisqusComments.render(Model.path, Model.config.disqusUrl))
+  }
+</article>

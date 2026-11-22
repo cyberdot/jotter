@@ -7,7 +7,6 @@ open FSharp.Formatting.Markdown
 open Jotter.Core.Config
 open Jotter.Core.IOUtils
 open Jotter.Core.Document
-open Jotter.Core.Store
 open Jotter.Core.Layout
 open Jotter.Core.Assets
 
@@ -51,23 +50,28 @@ module Post =
         
     // Model.path in the post templates must be a public URL, not a filesystem path, or
     // Disqus (and any theme's canonical link tag) keys off the wrong value.
-    let postUrl (config: ConfigurationModel) (fileName: string) = $"{config.url}/posts/{fileName}"
+    let postUrl (config: ConfigurationModel) (fileName: string) =
+        OutputUrls.post config fileName
 
-    let private preparePage (mdFile: string) =
+    let private preparePage (context: BuildContext) (mdFile: string) =
         let content = File.ReadAllText(mdFile)
-        let (frontmatter, mdContent) = content |> Document.splitIntoParts
+        let (frontmatter, mdContent) =
+            match Document.trySplitIntoParts content with
+            | Ok parts -> parts
+            | Error errors ->
+                raise (BuildException $"{mdFile}: {System.String.Join(System.Environment.NewLine, errors)}")
 
         let parsedContent = Markdown.Parse mdContent
         let htmlContent = Markdown.ToHtml parsedContent
 
-        let config = Config.data()
+        let config = context.config
         let fileName = mdFile |> Document.fileName
-        let htmlPath = mdFile |> Document.htmlFilename true
+        let htmlPath = Document.htmlFilename context.paths true mdFile
         let url = postUrl config fileName
         let excerpt = htmlContent |> Document.createExcerpt
 
-        let pageLayout = Layout.post()
-        let layoutTemplate = Layout.postLayout()
+        let pageLayout = Layout.post context
+        let layoutTemplate = Layout.postLayout context
 
         let vm = {
                    config = config;
@@ -80,8 +84,8 @@ module Post =
 
         let dvm = {
                      config = config;
-                     js = Assets.js("..");
-                     css = Assets.css("..");
+                     js = Assets.js context;
+                     css = Assets.css context;
                      content = result;
                      frontmatter = frontmatter;
                      filename = fileName;
@@ -98,38 +102,32 @@ module Post =
           config = config;
         }
         
-    let prepare (mdFile: string) (posts: Post list) =
-        let post = preparePage mdFile
-        Store.addPosts posts [post]
-
-    // Building the full list in one pass keeps this O(n) - threading each file through
-    // `prepare` in a loop would call Store.addPosts (an O(n) list append) once per file.
-    let prepareAll (files: string seq) : Post list =
-        files |> Seq.map preparePage |> Seq.toList
+    let prepareAll (context: BuildContext) (files: string seq) : Post list =
+        files |> Seq.map (preparePage context) |> Seq.toList
         
        
-    let create (title: string) (isDraft: bool) =
+    let create (paths: SitePaths) (title: string) (isDraft: bool) =
       let dir = match isDraft with
-                     | true -> $"{Config.contentDirectory}/drafts"
-                     | false -> $"{Config.contentDirectory}/posts"
+                     | true -> SitePaths.inWorkspace paths "drafts"
+                     | false -> SitePaths.inWorkspace paths "posts"
       let path = IOUtils.filenameFromTitle dir title
       let content = defaultPost title
       IOUtils.writeNewFile path content
         
-    let list () =
-        let dir = $"{Config.contentDirectory}/posts"
-        Directory.GetFiles(dir) |> Array.sort |> Array.rev
+    let list (paths: SitePaths) =
+        let dir = SitePaths.inWorkspace paths "posts"
+        IOUtils.discoverMarkdownFiles dir |> Array.rev
         
-    let init () =
-        let contentDir = $"{Config.contentDirectory}/posts"
+    let init (paths: SitePaths) =
+        let contentDir = SitePaths.inWorkspace paths "posts"
         if (Directory.Exists(contentDir)) then
             Directory.Delete(contentDir, true)
         Directory.CreateDirectory(contentDir) |> ignore
         
-        create "Welcome to Jotter" false
+        create paths "Welcome to Jotter" false
         
-    let setup () =
-         let publicDir = $"{Config.publicDirectory}/posts"
+    let setup (paths: SitePaths) =
+         let publicDir = SitePaths.inPublic paths "posts"
          if(Directory.Exists(publicDir)) then
              Directory.Delete(publicDir, true)
          Directory.CreateDirectory(publicDir) |> ignore

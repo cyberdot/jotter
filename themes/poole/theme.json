@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "poole",
+  "name": "Poole",
+  "version": "1.0.0",
+  "jotter": ">=1.0.0 <2.0.0",
+  "author": "Jotter contributors",
+  "license": "MIT",
+  "templates": {
+    "base": "layout/layout.cshtml",
+    "index": "layout/index.cshtml",
+    "post": "layout/post.cshtml",
+    "page": "layout/page.cshtml",
+    "tagLayout": "layout/tag_layout.cshtml",
+    "tagIndex": "layout/tag_index.cshtml"
+  },
+  "assets": {
+    "styles": [
+      "assets/css/01_poole.css",
+      "assets/css/02_syntax.css",
+      "assets/css/03_lanyon.css"
+    ],
+    "scripts": []
+  },
+  "features": ["posts", "pages", "tags", "pagination"]
+}

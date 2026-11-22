@@ -34,3 +34,7 @@ let ``filenameFromTitle builds a markdown path from directory and title`` () =
 [<Fact>]
 let ``filenameFromTitle uses the given directory as-is`` () =
     test <@ IOUtils.filenameFromTitle "_workspace/drafts" "Draft Title" = "_workspace/drafts/draft-title.markdown" @>
+
+[<Fact>]
+let ``slugFileName rejects a title that cannot produce a slug`` () =
+    Assert.Throws<BuildException>(fun () -> IOUtils.slugFileName "???" |> ignore) |> ignore

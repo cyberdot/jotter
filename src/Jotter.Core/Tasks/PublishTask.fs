@@ -1,8 +1,8 @@
 namespace Jotter.Core
 
 module PublishTask =
-    let run (title: string) =
+    let run (paths: SitePaths) (title: string) =
         if System.String.IsNullOrWhiteSpace(title) then
-            failwith "Cannot publish a draft without its title"
+            raise (BuildException "Cannot publish a draft without its title")
         else
-            Draft.publish title
+            Draft.publish paths title

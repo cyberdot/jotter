@@ -11,14 +11,14 @@ open Jotter.Core
 // the first post's content with no warning.
 [<Fact>]
 let ``create refuses to overwrite an existing post with the same slug`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory($"{Config.contentDirectory}/posts") |> ignore
-        let path = $"{Config.contentDirectory}/posts/a-new-post.markdown"
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(SitePaths.inWorkspace paths "posts") |> ignore
+        let path = SitePaths.inWorkspace paths "posts/a-new-post.markdown"
 
-        Post.create "A New Post" false
+        Post.create paths "A New Post" false
         File.WriteAllText(path, "edited by hand")
 
-        Assert.Throws<exn>(fun () -> Post.create "A New Post" false) |> ignore
+        Assert.Throws<BuildException>(fun () -> Post.create paths "A New Post" false) |> ignore
 
         test <@ File.ReadAllText(path) = "edited by hand" @>
     )
@@ -29,12 +29,12 @@ let ``postUrl builds an absolute URL under posts, not a filesystem path`` () =
 
 [<Fact>]
 let ``create stamps new posts with an unambiguous round-trip timestamp`` () =
-    TestHelpers.withTempWorkingDirectory (fun () ->
-        Directory.CreateDirectory($"{Config.contentDirectory}/posts") |> ignore
+    TestHelpers.withTempSite (fun paths ->
+        Directory.CreateDirectory(SitePaths.inWorkspace paths "posts") |> ignore
 
-        Post.create "A New Post" false
+        Post.create paths "A New Post" false
 
-        let content = File.ReadAllText($"{Config.contentDirectory}/posts/a-new-post.markdown")
+        let content = File.ReadAllText(SitePaths.inWorkspace paths "posts/a-new-post.markdown")
         let created = Regex.Match(content, "\"created\":\\s*\"([^\"]+)\"").Groups.[1].Value
 
         test <@ Regex.IsMatch(created, @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+[+-]\d{2}:\d{2}$") @>

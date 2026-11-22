@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "uno",
+  "name": "Uno",
+  "version": "1.0.0",
+  "jotter": ">=1.0.0 <2.0.0",
+  "author": "Jotter contributors",
+  "license": "MIT",
+  "templates": {
+    "base": "layout/layout.cshtml",
+    "index": "layout/index.cshtml",
+    "post": "layout/post.cshtml",
+    "page": "layout/page.cshtml"
+  },
+  "assets": {
+    "styles": [
+      "assets/css/1_uno.css",
+      "assets/css/2_monokai.css",
+      "assets/css/3_main.css",
+      "assets/css/animate.css"
+    ],
+    "scripts": [
+      "assets/js/main.js"
+    ]
+  },
+  "features": ["posts", "pages", "tags", "pagination"]
+}

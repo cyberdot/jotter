@@ -3,53 +3,27 @@ namespace Jotter.Core
 open System.IO
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
-open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.FileProviders
-open Microsoft.AspNetCore.Http
-open Giraffe
+open Microsoft.Extensions.Hosting
 
 module ServerTask =
-    let run () =
-        
-        let webApp =
-            choose [
-                route "/"       >=> htmlFile "index.html"
-            ]
-            
-        let configureApp (app : IApplicationBuilder) =
-                     let path = Config.publicDirectory.Substring(1).TrimStart('/').TrimEnd('/')
-                     let currentDir = Directory.GetCurrentDirectory()
-                     let dir = Path.Combine(currentDir, path)
-                     
-                     printfn "Current local dir %s" (Directory.GetCurrentDirectory())
-                     printfn "Current dir: %s" dir
-                     
-                     let options = StaticFileOptions()
-                     options.FileProvider <- new PhysicalFileProvider(dir)
-                     options.RequestPath <- PathString("")                   
-                   
-                     let defaultFileOptions = DefaultFilesOptions()
-                     defaultFileOptions.DefaultFileNames.Clear()
-                     defaultFileOptions.FileProvider <- new PhysicalFileProvider(dir)
-                     defaultFileOptions.DefaultFileNames.Add("index.html")
-                     
-                     app.UseDefaultFiles(defaultFileOptions) |> ignore
-                     app.UseStaticFiles(options) |> ignore
-                     app.UseGiraffe webApp
-                     
-        let configureServices (services : IServiceCollection) =
-                    // Add Giraffe dependencies
-                    services.AddGiraffe() |> ignore
+    let run (paths: SitePaths) (urls: string) =
+        if not (Directory.Exists(paths.publicDirectory)) then
+            raise (BuildException $"Public directory not found: {paths.publicDirectory}. Run 'build' first.")
 
-     
+        let configure (app: IApplicationBuilder) =
+            let provider = new PhysicalFileProvider(paths.publicDirectory)
+            let options = FileServerOptions()
+            options.FileProvider <- provider
+            options.EnableDefaultFiles <- true
+            options.EnableDirectoryBrowsing <- false
+            app.UseFileServer(options) |> ignore
+
         Host.CreateDefaultBuilder()
-           .ConfigureWebHostDefaults(
-            fun webHostBuilder ->
-                webHostBuilder
-                    .Configure(configureApp)
-                    .ConfigureServices(configureServices)
+            .ConfigureWebHostDefaults(fun webHost ->
+                webHost
+                    .UseUrls(if System.String.IsNullOrWhiteSpace(urls) then "http://localhost:5000" else urls)
+                    .Configure(configure)
                     |> ignore)
-          .Build()
-          .Run()
-        ()
+            .Build()
+            .Run()
