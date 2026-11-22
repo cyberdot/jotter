@@ -132,6 +132,20 @@ let main argv =
             Console.WriteLine($"Theme '{id}' selected."))))
     themeCmd.Add(themeUseCmd)
 
+    let themeUpdateCmd = Command("update", "Refresh the catalog or one cached theme")
+    let updateThemeArg = Argument<string>("theme")
+    updateThemeArg.Arity <- ArgumentArity.ZeroOrOne
+    themeUpdateCmd.Add(updateThemeArg)
+    themeUpdateCmd.SetAction(Func<ParseResult, int>(fun pr ->
+        execute(fun () ->
+            let id = pr.GetValue(updateThemeArg)
+            let requested = if String.IsNullOrWhiteSpace(id) then None else Some id
+            Jotter.Core.Theme.refresh paths requested
+            match requested with
+            | Some value -> Console.WriteLine($"Catalog and theme '{value}' refreshed.")
+            | None -> Console.WriteLine("Theme catalog refreshed."))))
+    themeCmd.Add(themeUpdateCmd)
+
     root.Add(themeCmd)
 
     root.Parse(argv).Invoke()

@@ -1,8 +1,7 @@
 name: Release
 
-# Builds and tests master, publishes versioned Jotter.Console executables for
-# Windows, Linux, and macOS (x64), tags master with that version, and creates
-# a GitHub release with the executables attached.
+# Builds and tests master, publishes versioned standalone executables and a
+# Cyberdot.Jotter .NET tool package, tags master, and creates a GitHub release.
 on:
   workflow_dispatch:
     inputs:
@@ -76,6 +75,24 @@ jobs:
       - name: Test
         run: dotnet test Jotter.slnx --configuration Release --no-build
 
+      - name: Pack .NET tool
+        id: tool
+        run: |
+          dotnet pack src/Jotter.Console/Jotter.Console.fsproj `
+            --configuration Release `
+            --no-build `
+            -p:Version=${{ steps.version.outputs.version }} `
+            --output packages
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $package = Get-ChildItem packages/Cyberdot.Jotter.*.nupkg |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $package) {
+            Write-Output "::error::Cyberdot.Jotter package was not produced."
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "package=$package"
+
       - name: Publish console executables
         id: publish
         run: |
@@ -101,6 +118,7 @@ jobs:
             $assets += $asset
           }
 
+          $assets += "${{ steps.tool.outputs.package }}"
           Add-Content -Path $env:GITHUB_OUTPUT -Value "assets=$($assets -join ' ')"
 
       - name: Create GitHub release

@@ -1,6 +1,7 @@
 <Project>
 
 	<PropertyGroup>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<!--
 		  FSharp.Formatting 22.2.0 depends on FSharp.Compiler.Service 43.12.204, which pins an exact
 		  FSharp.Core version (10.1.204). The .NET 10 SDK's F# tooling implicitly references a newer

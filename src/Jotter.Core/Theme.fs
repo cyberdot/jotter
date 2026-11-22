@@ -87,6 +87,11 @@ module Theme =
     let private nullableOption value =
         if String.IsNullOrWhiteSpace(value) then None else Some value
 
+    let isSafeId (value: string) =
+        not (String.IsNullOrWhiteSpace(value))
+        && value.Length <= 100
+        && value |> Seq.forall (fun c -> Char.IsLetterOrDigit(c) || c = '-' || c = '_')
+
     let private ensureRelativePath (root: string) (relativePath: string) =
         if String.IsNullOrWhiteSpace(relativePath) then
             Error "Path must not be blank."
@@ -121,9 +126,16 @@ module Theme =
         | Ok _ -> errors
 
     let private currentJotterVersion =
-        Assembly.GetExecutingAssembly().GetName().Version
-        |> Option.ofObj
-        |> Option.defaultValue (Version(1, 0))
+        let informational =
+            Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                |> Option.ofObj
+                |> Option.map (fun attribute -> attribute.InformationalVersion)
+                |> Option.defaultValue "1.0.0"
+        let numeric = informational.Split([| '+'; '-' |], 2, StringSplitOptions.RemoveEmptyEntries).[0]
+        match Version.TryParse(numeric) with
+        | true, version -> version
+        | false, _ -> Version(1, 0, 0)
 
     let private isCompatible (range: string) =
         if String.IsNullOrWhiteSpace(range) then
@@ -152,6 +164,8 @@ module Theme =
                             && currentJotterVersion.Minor = version.Minor
                             && currentJotterVersion.Build = version.Build
                     | _ -> false)
+
+    let compatibilityVersion () = currentJotterVersion.ToString()
 
     let private validateManifestDto (root: string) (expectedId: string option) (dto: ThemeManifestDto) =
         let mutable errors = []
@@ -264,7 +278,9 @@ module Theme =
         | Error errors -> raise (BuildException(String.Join(Environment.NewLine, errors)))
 
     let tryLoadCatalog (paths: SitePaths) =
-        let catalogPath = Path.Combine(paths.bundledThemes, catalogFileName)
+        let catalogRoot = ThemeRepository.ensureCatalog paths false
+        let localCatalog = ThemeRepository.hasLocalCatalog paths
+        let catalogPath = Path.Combine(catalogRoot, catalogFileName)
         loadJson<ThemeCatalogDto> catalogPath
         |> Result.bind (fun catalog ->
             if isNull (box catalog) || catalog.schemaVersion <> 1 then
@@ -277,35 +293,38 @@ module Theme =
                 let relativePaths = Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase)
 
                 for entry in catalog.themes do
-                    if String.IsNullOrWhiteSpace(entry.id) then errors.Add("Catalog theme id must not be blank.")
+                    if not (isSafeId entry.id) then
+                        errors.Add($"Catalog theme id '{entry.id}' is invalid. Use letters, digits, '-' and '_' only.")
                     elif not (ids.Add(entry.id)) then errors.Add($"Duplicate theme id: '{entry.id}'.")
 
                     if String.IsNullOrWhiteSpace(entry.name) then errors.Add($"Theme '{entry.id}' name must not be blank.")
                     if String.IsNullOrWhiteSpace(entry.path) then
                         errors.Add($"Theme '{entry.id}' path must not be blank.")
                     else
-                        match ensureRelativePath paths.bundledThemes entry.path with
+                        match ensureRelativePath catalogRoot entry.path with
                         | Error error -> errors.Add($"Theme '{entry.id}': {error}")
                         | Ok root ->
                             if not (relativePaths.Add(Path.GetFullPath(root))) then
                                 errors.Add($"Duplicate theme path: '{entry.path}'.")
-                            if not (Directory.Exists(root)) then
+                            if localCatalog && not (Directory.Exists(root)) then
                                 errors.Add($"Theme '{entry.id}' directory not found: '{entry.path}'.")
-                            match tryLoadManifest root (Some entry.id) with
-                            | Ok _ -> ()
-                            | Error manifestErrors ->
-                                manifestErrors |> List.iter (fun error -> errors.Add($"Theme '{entry.id}': {error}"))
+                            if localCatalog then
+                                match tryLoadManifest root (Some entry.id) with
+                                | Ok _ -> ()
+                                | Error manifestErrors ->
+                                    manifestErrors |> List.iter (fun error -> errors.Add($"Theme '{entry.id}': {error}"))
 
                 let registered =
                     catalog.themes
                     |> Array.choose (fun entry -> nullableOption entry.path)
-                    |> Array.map (fun path -> Path.GetFullPath(Path.Combine(paths.bundledThemes, path)))
+                    |> Array.map (fun path -> Path.GetFullPath(Path.Combine(catalogRoot, path)))
                     |> Set.ofArray
 
-                Directory.GetDirectories(paths.bundledThemes)
-                |> Array.iter (fun directory ->
-                    if not (registered.Contains(Path.GetFullPath(directory))) then
-                        errors.Add($"Unregistered theme directory: '{Path.GetFileName(directory)}'."))
+                if localCatalog then
+                    Directory.GetDirectories(catalogRoot)
+                    |> Array.iter (fun directory ->
+                        if not (registered.Contains(Path.GetFullPath(directory))) then
+                            errors.Add($"Unregistered theme directory: '{Path.GetFileName(directory)}'."))
 
                 if errors.Count = 0 then
                     Ok(Array.toList catalog.themes)
@@ -332,11 +351,15 @@ module Theme =
                     (BuildException
                         $"""Unknown theme '{themeId}'. Available themes: {String.Join(", ", available paths)}."""))
         let root =
-            match ensureRelativePath paths.bundledThemes entry.path with
-            | Ok value -> value
-            | Error error -> raise (BuildException error)
-        { root = root
-          manifest = loadManifest root (Some entry.id) }
+            ThemeRepository.ensureTheme paths entry.path false (fun root ->
+                loadManifest root (Some entry.id) |> ignore)
+        try
+            { root = root
+              manifest = loadManifest root (Some entry.id) }
+        with ex ->
+            if not (ThemeRepository.hasLocalCatalog paths) then
+                ThemeRepository.invalidateTheme paths entry.path
+            reraise ()
 
     let resolveProject (paths: SitePaths) (themeId: string) =
         let themesRoot = SitePaths.inWorkspace paths "themes"
@@ -348,16 +371,31 @@ module Theme =
             { root = root
               manifest = loadManifest root (Some themeId) }
 
-    let init (paths: SitePaths) (themeId: string) =
-        let source = resolveBundled paths themeId
-        let destination = SitePaths.inWorkspace paths (Path.Combine("themes", themeId))
+    let install (paths: SitePaths) (themeId: string) (source: ThemeSource) =
+        if not (isSafeId themeId) then
+            raise (BuildException $"Invalid theme id '{themeId}'.")
+        if source.manifest.id <> themeId then
+            raise (BuildException $"Resolved theme '{source.manifest.id}' does not match requested id '{themeId}'.")
+        let themesRoot = SitePaths.inWorkspace paths "themes"
+        let destination =
+            match ensureRelativePath themesRoot themeId with
+            | Ok path -> path
+            | Error error -> raise (BuildException error)
         Directory.CreateDirectory(Path.GetDirectoryName(destination)) |> ignore
         copyDirectory source.root destination
+
+    let init (paths: SitePaths) (themeId: string) =
+        let source = resolveBundled paths themeId
+        install paths themeId source
 
     let copyToProject (paths: SitePaths) (themeId: string) =
         if not (Directory.Exists(paths.workspace)) then
             raise (BuildException $"Site workspace not found: '{paths.workspace}'. Run 'init' first.")
-        let destination = SitePaths.inWorkspace paths (Path.Combine("themes", themeId))
+        let themesRoot = SitePaths.inWorkspace paths "themes"
+        let destination =
+            match ensureRelativePath themesRoot themeId with
+            | Ok path -> path
+            | Error error -> raise (BuildException error)
         if Directory.Exists(destination) then
             raise (BuildException $"Theme '{themeId}' already exists at '{destination}'.")
         init paths themeId
@@ -365,8 +403,7 @@ module Theme =
     let createProjectTheme (paths: SitePaths) (themeId: string) =
         if not (Directory.Exists(paths.workspace)) then
             raise (BuildException $"Site workspace not found: '{paths.workspace}'. Run 'init' first.")
-        if String.IsNullOrWhiteSpace(themeId)
-           || themeId |> Seq.exists (fun c -> not (Char.IsLetterOrDigit(c) || c = '-' || c = '_')) then
+        if not (isSafeId themeId) then
             raise (BuildException "Theme id may contain only letters, digits, '-' and '_'.")
         let themeRoot = SitePaths.inWorkspace paths (Path.Combine("themes", themeId))
         if Directory.Exists(themeRoot) then
@@ -432,6 +469,19 @@ module Theme =
                     resolveProject paths id |> ignore)
 
     let validateBundled = validate
+
+    let refresh (paths: SitePaths) (themeId: string option) =
+        ThemeRepository.refresh paths None (fun _ -> ())
+        let catalogEntries = loadCatalog paths
+        themeId
+        |> Option.iter (fun id ->
+            let entry =
+                catalogEntries
+                |> List.tryFind (fun item -> item.id = id)
+                |> Option.defaultWith (fun () ->
+                    raise (BuildException $"Unknown remote theme '{id}'."))
+            ThemeRepository.refresh paths (Some entry.path) (fun root ->
+                loadManifest root (Some entry.id) |> ignore))
 
     let templatePath (theme: ThemeSource) (relativePath: string) =
         match ensureRelativePath theme.root relativePath with

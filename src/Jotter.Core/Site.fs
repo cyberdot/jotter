@@ -46,11 +46,12 @@ module Site =
        let availableThemes = Theme.available paths
        if not (Array.contains theme availableThemes) then
            raise (BuildException $"""Unknown theme '{theme}'. Available themes: {String.Join(", ", availableThemes)}.""")
+       let themeSource = Theme.resolveBundled paths theme
 
        clean paths
        copyRootFiles paths
        Config.init paths theme
-       Theme.init paths theme
+       Theme.install paths theme themeSource
        Draft.init paths
        Page.init paths
        Post.init paths

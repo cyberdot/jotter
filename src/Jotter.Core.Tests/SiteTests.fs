@@ -27,3 +27,22 @@ let ``init rejects an unknown theme before touching the filesystem`` () =
 
         test <@ not (Directory.Exists(paths.workspace)) @>
     )
+
+[<Fact>]
+let ``init force validates the selected theme before deleting an existing site`` () =
+    TestHelpers.withTempSite (fun paths ->
+        let localThemes = SitePaths.inDirectory paths "local-themes"
+        Directory.CreateDirectory(Path.Combine(localThemes, "broken", "layout")) |> ignore
+        File.WriteAllText(
+            Path.Combine(localThemes, "themes.json"),
+            """{"schemaVersion":1,"themes":[{"id":"broken","name":"Broken","path":"broken","description":"broken"}]}""")
+        File.WriteAllText(Path.Combine(localThemes, "broken", "theme.json"), """{"schemaVersion":1}""")
+        let paths = { paths with bundledThemes = localThemes }
+        Directory.CreateDirectory(paths.workspace) |> ignore
+        let sentinel = SitePaths.inWorkspace paths "sentinel.txt"
+        File.WriteAllText(sentinel, "keep me")
+
+        Assert.Throws<BuildException>(fun () -> Site.init paths "broken" true) |> ignore
+
+        test <@ File.ReadAllText(sentinel) = "keep me" @>
+    )

@@ -1,6 +1,9 @@
 module Jotter.Core.Tests.ThemeTests
 
 open System.IO
+open System
+open System.Reflection
+open Newtonsoft.Json
 open Xunit
 open Swensen.Unquote
 open Jotter.Core
@@ -84,4 +87,87 @@ let ``useProjectTheme updates configuration to an installed local theme`` () =
         Theme.useProjectTheme paths "custom"
 
         test <@ (Config.load paths).theme = "custom" @>
+    )
+
+[<Fact>]
+let ``catalog rejects unsafe ids before they can be used as project paths`` () =
+    TestHelpers.withTempSite (fun paths ->
+        let root = SitePaths.inDirectory paths "unsafe-catalog"
+        Directory.CreateDirectory(root) |> ignore
+        File.WriteAllText(
+            Path.Combine(root, "themes.json"),
+            """{"schemaVersion":1,"themes":[{"id":"../outside","name":"Unsafe","path":"safe","description":"unsafe"}]}""")
+
+        let paths = { paths with bundledThemes = root }
+
+        let result =
+            try
+                Theme.loadCatalog paths |> ignore
+                false
+            with :? BuildException as ex ->
+                ex.Message.Contains("invalid")
+
+        test <@ result @>
+    )
+
+[<Fact>]
+let ``theme compatibility uses the informational product version`` () =
+    let attribute =
+        typeof<ThemeManifest>.Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            |> nonNull
+    let informational =
+        attribute
+            .InformationalVersion
+            .Split([| '+'; '-' |], 2, StringSplitOptions.RemoveEmptyEntries).[0]
+
+    test <@ Theme.compatibilityVersion() = Version.Parse(informational).ToString() @>
+
+[<Fact>]
+let ``cached remote catalog and one theme resolve without a local development catalog`` () =
+    TestHelpers.withTempSite (fun paths ->
+        let paths =
+            { paths with bundledThemes = SitePaths.inDirectory paths "published-no-themes" }
+        let cacheRoot = ThemeRepository.cacheRoot paths
+        Directory.CreateDirectory(cacheRoot) |> ignore
+        File.Copy(Path.Combine(AppContext.BaseDirectory, "themes", "themes.json"), Path.Combine(cacheRoot, "themes.json"))
+        let themeRoot = Path.Combine(cacheRoot, "whisper")
+        IOUtils.copyDirectory (Path.Combine(AppContext.BaseDirectory, "themes", "whisper")) themeRoot
+        File.WriteAllText(
+            themeRoot + ".complete.json",
+            JsonConvert.SerializeObject(
+                { ThemeCacheMetadata.repository = ThemeRepository.repository()
+                  reference = ThemeRepository.reference()
+                  theme = "whisper"
+                  downloadedAt = DateTimeOffset.UtcNow }))
+
+        let available = Theme.available paths
+        let source = Theme.resolveBundled paths "whisper"
+
+        test <@ Array.contains "whisper" available @>
+        test <@ source.manifest.id = "whisper" @>
+    )
+
+[<Fact>]
+let ``init copies a cached remote theme without downloading other themes`` () =
+    TestHelpers.withTempSite (fun paths ->
+        let paths =
+            { paths with bundledThemes = SitePaths.inDirectory paths "published-no-themes" }
+        let cacheRoot = ThemeRepository.cacheRoot paths
+        Directory.CreateDirectory(cacheRoot) |> ignore
+        File.Copy(Path.Combine(AppContext.BaseDirectory, "themes", "themes.json"), Path.Combine(cacheRoot, "themes.json"))
+        let themeRoot = Path.Combine(cacheRoot, "whisper")
+        IOUtils.copyDirectory (Path.Combine(AppContext.BaseDirectory, "themes", "whisper")) themeRoot
+        File.WriteAllText(
+            themeRoot + ".complete.json",
+            JsonConvert.SerializeObject(
+                { ThemeCacheMetadata.repository = ThemeRepository.repository()
+                  reference = ThemeRepository.reference()
+                  theme = "whisper"
+                  downloadedAt = DateTimeOffset.UtcNow }))
+
+        Site.init paths "whisper" false
+
+        test <@ File.Exists(SitePaths.inWorkspace paths "themes/whisper/theme.json") @>
+        test <@ not (Directory.Exists(Path.Combine(cacheRoot, "architect"))) @>
     )

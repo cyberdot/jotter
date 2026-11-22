@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<Compile Include="SitePaths.fs" />
+		<Compile Include="ThemeRepository.fs" />
 		<Compile Include="IOUtils.fs" />
 		<Compile Include="Config.fs" />
 		<Compile Include="Theme.fs" />

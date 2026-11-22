@@ -52,7 +52,8 @@ let withTempSite (action: SitePaths -> 'a) : 'a =
     let tempDirectory = Path.Combine(Path.GetTempPath(), $"jotter-test-{Guid.NewGuid()}")
     Directory.CreateDirectory(tempDirectory) |> ignore
     try
-        action (SitePaths.fromRoot tempDirectory)
+        let paths = SitePaths.fromRoot tempDirectory
+        action { paths with themeCache = Path.Combine(tempDirectory, ".theme-cache") }
     finally
         Directory.Delete(tempDirectory, true)
 

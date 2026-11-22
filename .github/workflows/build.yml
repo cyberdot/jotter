@@ -36,3 +36,6 @@ jobs:
 
       - name: Test
         run: dotnet test Jotter.slnx --configuration Release --no-build
+
+      - name: Pack .NET tool
+        run: dotnet pack src/Jotter.Console/Jotter.Console.fsproj --configuration Release --no-build --output artifacts
